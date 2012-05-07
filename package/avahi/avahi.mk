@@ -83,7 +83,7 @@ AVAHI_CONF_OPT = --localstatedir=/var \
 		--with-autoipd-user=default \
 		--with-autoipd-group=default
 
-AVAHI_DEPENDENCIES = $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext libintl) host-intltool host-pkg-config
+AVAHI_DEPENDENCIES = host-intltool host-pkg-config
 
 ifneq ($(BR2_PACKAGE_AVAHI_DAEMON)$(BR2_PACKAGE_AVAHI_AUTOIPD),)
 AVAHI_DEPENDENCIES += libdaemon
@@ -131,8 +131,8 @@ else
 AVAHI_CONF_OPT += --disable-python
 endif
 
-ifeq ($(BR2_PACKAGE_LIBINTL),y)
-AVAHI_DEPENDENCIES += libintl
+ifeq ($(BR2_NEEDS_GETTEXT_IF_LOCALE),y)
+AVAHI_DEPENDENCIES += gettext
 AVAHI_MAKE_OPT = LIBS=-lintl
 endif
 
