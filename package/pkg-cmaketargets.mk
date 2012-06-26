@@ -50,6 +50,8 @@ $(2)_CLEAN_OPT			?= clean
 $(2)_SRCDIR			= $$($(2)_DIR)/$($(2)_SUBDIR)
 $(2)_BUILDDIR			= $$($(2)_SRCDIR)
 
+$(2)_HOST_FIX_RPATH             = NO
+
 #
 # Configure step. Only define it if not already defined by the package
 # .mk file. And take care of the differences between host and target
@@ -81,6 +83,7 @@ define $(2)_CONFIGURE_CMDS
 		-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY="BOTH" \
 		-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE="BOTH" \
 		-DCMAKE_INSTALL_PREFIX="$$(HOST_DIR)/usr" \
+		-DCMAKE_INSTALL_RPATH="$$ORIGIN/../lib" \
 		$$($$(PKG)_CONF_OPT) \
 	)
 endef
@@ -211,4 +214,3 @@ $(HOST_DIR)/usr/share/buildroot/toolchainfile.cmake:
 	set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)\n\
 	set(ENV{PKG_CONFIG_SYSROOT_DIR} \"\$${_HOST_DIR}/usr/$(REAL_GNU_TARGET_NAME)/sysroot\")\n\
 	" > $@
-

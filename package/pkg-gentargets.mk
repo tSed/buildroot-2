@@ -252,6 +252,13 @@ $(2)_INSTALL_IMAGES		?= NO
 $(2)_INSTALL_TARGET		?= YES
 $(2)_DIR_PREFIX			= $(if $(4),$(4),$(TOP_SRCDIR)/package)
 
+# The following flag is only used by host packages.
+# For most of those packages, except at least the CMake-based ones, it is not
+# easy to correctly set the rpath in the LDFLAGS, then this is handled in a
+# post-build hook.
+$(2)_HOST_FIX_RPATH             ?= YES
+$(2)_HOST_RPATH_PREFIX          ?= $$$$$$$$
+
 # define sub-target stamps
 $(2)_TARGET_INSTALL_TARGET =	$$($(2)_DIR)/.stamp_target_installed
 $(2)_TARGET_INSTALL_STAGING =	$$($(2)_DIR)/.stamp_staging_installed
@@ -435,6 +442,24 @@ endif # SITE_METHOD
 DL_TOOLS_DEPENDENCIES += $(firstword $(INFLATE$(suffix $($(2)_SOURCE))))
 
 endif # $(2)_KCONFIG_VAR
+
+#
+# Hool to fix RPATH on host package if needed.
+#
+define $(2)_POST_CONFIGURE_FIX_RPATH
+ @$$(call MESSAGE,"Adjusting rpath")
+ find $$($(2)_BUILDDIR) -type f -exec \
+  $(SED) 's;X\(ORIGIN/\.\./lib\);$$($(2)_HOST_RPATH_PREFIX)\1;g' '{}' ';'
+endef
+
+# Automatically add host-chrpath dependency and the rpath fix post-build hook to
+# any host package, but chrpath itself.
+ifeq ($$($(2)_TYPE),host)
+ifeq ($$($(2)_HOST_FIX_RPATH),YES)
+$(2)_POST_CONFIGURE_HOOKS += $(2)_POST_CONFIGURE_FIX_RPATH
+endif
+endif
+
 endef # GENTARGETS_INNER
 
 ################################################################################
