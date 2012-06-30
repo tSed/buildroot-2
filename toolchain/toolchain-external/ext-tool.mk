@@ -105,9 +105,8 @@ endif # ! no threads
 
 
 TOOLCHAIN_EXTERNAL_PREFIX=$(call qstrip,$(BR2_TOOLCHAIN_EXTERNAL_PREFIX))
-TOOLCHAIN_EXTERNAL_SUBDIR=opt/ext-toolchain
 ifeq ($(BR2_TOOLCHAIN_EXTERNAL_DOWNLOAD),y)
-TOOLCHAIN_EXTERNAL_DIR=$(HOST_DIR)/$(TOOLCHAIN_EXTERNAL_SUBDIR)
+TOOLCHAIN_EXTERNAL_DIR=$(HOST_DIR)/opt/ext-toolchain
 else
 TOOLCHAIN_EXTERNAL_DIR=$(call qstrip,$(BR2_TOOLCHAIN_EXTERNAL_PATH))
 endif
@@ -552,7 +551,6 @@ $(HOST_DIR)/usr/bin/ext-toolchain-wrapper: $(TOOLCHAIN_EXTERNAL_INSTALL)
 	# the generated binary with older platforms
 	$(HOSTCC) $(HOST_CFLAGS) $(TOOLCHAIN_EXTERNAL_WRAPPER_ARGS) -s -Wl,--hash-style=both \
 		toolchain/toolchain-external/ext-toolchain-wrapper.c -o $@
-	$(call ADJUST_RPATH)
 
 toolchain-external: dependencies $(HOST_DIR)/usr/bin/ext-toolchain-wrapper
 
