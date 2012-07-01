@@ -256,7 +256,7 @@ $(2)_DIR_PREFIX			= $(if $(4),$(4),$(TOP_SRCDIR)/package)
 # For most of those packages, except at least the CMake-based ones, it is not
 # easy to correctly set the rpath in the LDFLAGS, then this is handled in a
 # post-build hook.
-$(2)_HOST_FIX_RPATH             ?= YES
+$(2)_HOST_FIX_RPATH             ?= NO
 $(2)_HOST_RPATH_PREFIX          ?= $$$$$$$$
 
 # define sub-target stamps
@@ -449,7 +449,7 @@ endif # $(2)_KCONFIG_VAR
 define $(2)_POST_CONFIGURE_FIX_RPATH
  @$$(call MESSAGE,"Adjusting rpath")
  find $$($(2)_BUILDDIR) -type f -exec \
-  $(SED) 's;X\(ORIGIN/\.\./lib\);$$($(2)_HOST_RPATH_PREFIX)\1;g' '{}' ';'
+  $(SED) "s;\(-Wl,-rpath,'\).*\?\(/../lib'\);\1$$($(2)_HOST_RPATH_PREFIX)ORIGIN\2;g" '{}' ';'
 endef
 
 # Automatically add host-chrpath dependency and the rpath fix post-build hook to

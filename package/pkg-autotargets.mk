@@ -82,6 +82,10 @@ $(2)_CLEAN_OPT			?= clean
 $(2)_UNINSTALL_STAGING_OPT	?= DESTDIR=$$(STAGING_DIR) uninstall
 $(2)_UNINSTALL_TARGET_OPT	?= DESTDIR=$$(TARGET_DIR)  uninstall
 
+$(2)_HOST_FIX_RPATH             ?= YES
+$(2)_HOST_RPATH_PREFIX          ?= \$$$$\$$$$
+
+
 #
 # Configure step. Only define it if not already defined by the package
 # .mk file. And take care of the differences between host and target
