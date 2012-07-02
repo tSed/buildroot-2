@@ -84,7 +84,7 @@ $(2)_UNINSTALL_TARGET_OPT	?= DESTDIR=$$(TARGET_DIR)  uninstall
 
 # for host package only
 $(2)_FIX_RPATH                  ?= YES
-$(2)_RPATH_PREFIX               ?= \$$$$
+$(2)_RPATH_PREFIX               ?= $$$$$$$$
 
 
 #

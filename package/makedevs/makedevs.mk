@@ -23,7 +23,7 @@ endef
 
 
 define HOST_MAKEDEVS_BUILD_CMDS
-	$(HOSTCC) $(HOST_CFLAGS) $(HOST_LDFLAGS) \
+	$(HOSTCC) $(HOST_CFLAGS) $(subst XORIGIN,$$ORIGIN,$(HOST_LDFLAGS)) \
 		package/makedevs/makedevs.c -o $(@D)/makedevs
 endef
 
