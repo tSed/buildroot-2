@@ -50,7 +50,8 @@ $(2)_CLEAN_OPT			?= clean
 $(2)_SRCDIR			= $$($(2)_DIR)/$($(2)_SUBDIR)
 $(2)_BUILDDIR			= $$($(2)_SRCDIR)
 
-$(2)_HOST_FIX_RPATH             = NO
+# for host package only
+$(2)_FIX_RPATH                  = NO
 
 #
 # Configure step. Only define it if not already defined by the package

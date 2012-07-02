@@ -82,8 +82,9 @@ $(2)_CLEAN_OPT			?= clean
 $(2)_UNINSTALL_STAGING_OPT	?= DESTDIR=$$(STAGING_DIR) uninstall
 $(2)_UNINSTALL_TARGET_OPT	?= DESTDIR=$$(TARGET_DIR)  uninstall
 
-$(2)_HOST_FIX_RPATH             ?= YES
-$(2)_HOST_RPATH_PREFIX          ?= \$$$$\$$$$
+# for host package only
+$(2)_FIX_RPATH                  ?= YES
+$(2)_RPATH_PREFIX               ?= \$$$$
 
 
 #
