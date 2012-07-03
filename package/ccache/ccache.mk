@@ -42,6 +42,8 @@ endef
 HOST_CCACHE_POST_CONFIGURE_HOOKS += \
 	HOST_CCACHE_PATCH_CONFIGURATION
 
+HOST_CCACHE_RPATH_PREFIX = \$$$$\\\$$$$
+
 $(eval $(call AUTOTARGETS))
 $(eval $(call AUTOTARGETS,host))
 
@@ -49,4 +51,3 @@ ifeq ($(BR2_CCACHE),y)
 ccache-stats: host-ccache
 	$(Q)$(CCACHE) -s
 endif
-
