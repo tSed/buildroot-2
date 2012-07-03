@@ -458,14 +458,13 @@ endif # $(2)_KCONFIG_VAR
 define $(2)_POST_CONFIGURE_FIX_RPATH
  @$$(call MESSAGE,"Adjusting rpath")
  find $$($(2)_BUILDDIR) -type f -exec \
-  $(SED) "s;\(-Wl,-rpath,'\).*\?\(/../lib'\);\1$$($(2)_HOST_RPATH_PREFIX)ORIGIN\2;g" '{}' ';'
+  $(SED) "s;\(-Wl,-rpath,'\).*\?\(/../lib'\);\1$$($(2)_RPATH_PREFIX)ORIGIN\2;g" '{}' ';'
 endef
 
 # Automatically add host-chrpath dependency and the rpath fix post-build hook to
 # any host package, but chrpath itself.
 ifeq ($$($(2)_TYPE),host)
 ifeq ($$($(2)_FIX_RPATH),YES)
-ifeq ($$($(2)_HOST_FIX_RPATH),YES)
 $(2)_POST_CONFIGURE_HOOKS += $(2)_POST_CONFIGURE_FIX_RPATH
 endif
 endif
