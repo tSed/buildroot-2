@@ -183,8 +183,7 @@ for f in $(find "${BR2_HOST_DIR}" -type f -a '(' -path '*/usr/lib/*' -o -path '*
   ! '(' -path '*/sysroot/*' -o -path '*/include/*' -o -path '*/share/locale/*' -o \
         -path '*/share/info/*' -o -path '*/man/*' -o -path '*/share/terminfo/*' -o \
         -path '*/usr/lib/gcc/*' -o -path '*/usr/*/lib/*' -o \
-        -path '*/html/*' -o -name '*.cmake' -o -name '*.txt' -o \
-        -name 'arm-unknown-linux-uclibcgnueabi*' ')' ) ; do
+        -path '*/html/*' -o -name '*.cmake' -o -name '*.txt' ')' ) ; do
   file "${f}" | grep -q "${f}: ELF" || continue
   do_scan_elffile "${f}"
   result=$?
