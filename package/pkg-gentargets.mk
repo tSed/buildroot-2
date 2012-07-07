@@ -455,6 +455,16 @@ DL_TOOLS_DEPENDENCIES += $(firstword $(INFLATE$(suffix $($(2)_SOURCE))))
 
 endif # $(2)_KCONFIG_VAR
 
+define CHRPATH
+ @$$(call MESSAGE,"Adjusting rpath")
+ test -x $(HOST_DIR)/usr/bin/chrpath
+ for f in $$$$(find $$(1) -type f ) ; do \
+  file "$$$${f}" | grep -qE ": ELF.*?, dynamically linked" || continue ; \
+  readelf -d "$$$${f}" | grep -qE 'rpath.*?$$(2)ORIGIN' || continue ; \
+  $(HOST_DIR)/usr/bin/chrpath -r '$$$$ORIGIN/../lib' "$$$${f}" ; \
+ done
+endef
+
 # Hook to fix RPATH on host package if needed.
 ifeq ($$($(2)_TYPE) $$($(2)_FIX_RPATH),host YES)
 
@@ -482,13 +492,7 @@ $(2)_DEPENDENCIES += host-chrpath
 $(2)_RPATH_PREFIX = X
 
 define $(2)_POST_INSTALL_CHRPATH
- @$$(call MESSAGE,"Adjusting rpath")
- test -x $(HOST_DIR)/usr/bin/chrpath
- for f in $$$$(find $(HOST_DIR) -type f ) ; do \
-  file "$$$${f}" | grep -qE ": ELF.*?, dynamically linked" || continue ; \
-  readelf -d "$$$${f}" | grep -qE 'rpath.*?$$($(2)_RPATH_PREFIX)ORIGIN' || continue ; \
-  $(HOST_DIR)/usr/bin/chrpath -r '$$$$ORIGIN/../lib' "$$$${f}" ; \
- done
+ $$(call CHRPATH,$$(HOST_DIR),$$($(2)_RPATH_PREFIX))
 endef
 
 $(2)_POST_INSTALL_HOOKS += $(2)_POST_INSTALL_CHRPATH
