@@ -102,7 +102,8 @@ define CHRPATH
  test -x $(HOST_DIR)/usr/bin/chrpath
  test x$(1) != x && export _search_root=$(1)  || export _search_root=$(HOST_DIR) ; \
  test x$(2) != x && export _rpath_prefix=$(2) || export _rpath_prefix=$(HOST_RPATH_PREFIX_DEFAULT) ; \
- for f in $$(find $${_search_root} -type f -a '!' -path '*/$(STAGING_SUBDIR)/*' -print) ; do \
+ for f in $$(find $${_search_root} -type f -a  '!' -path '*/$(STAGING_SUBDIR)/*' -a \
+   '!' -path '*/$(TOOLCHAIN_EXTERNAL_SUBDIR)/*' -print) ; do \
   file "$${f}" | grep -qE ": ELF.*?, dynamically linked" || continue ; \
   readelf -d "$${f}" | grep -qE "rpath.*?$${_rpath_prefix}ORIGIN" || continue ; \
   $(HOST_DIR)/usr/bin/chrpath -r '$$ORIGIN/../lib' "$${f}" ; \
