@@ -489,7 +489,7 @@ else
 # any host package, but chrpath itself.
 
 $(2)_DEPENDENCIES += host-chrpath
-$(2)_RPATH_PREFIX = X
+$(2)_RPATH_PREFIX = $(HOST_RPATH_PREFIX_DEFAULT)
 
 define $(2)_POST_INSTALL_CHRPATH
  $$(call CHRPATH,$$(HOST_DIR),$$($(2)_RPATH_PREFIX))
