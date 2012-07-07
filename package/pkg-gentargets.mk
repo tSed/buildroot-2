@@ -485,8 +485,8 @@ define $(2)_POST_INSTALL_CHRPATH
  @$$(call MESSAGE,"Adjusting rpath")
  test -x $(HOST_DIR)/usr/bin/chrpath
  for f in $$$$(find $(HOST_DIR) -type f ) ; do \
-  file "$$$${f}" | grep -qE "$$$${f}: ELF.*?, dynamically linked" || continue ; \
-  readelf -d "$$$${f}" | grep -qE 'rpath.*?XORIGIN' || continue ; \
+  file "$$$${f}" | grep -qE ": ELF.*?, dynamically linked" || continue ; \
+  readelf -d "$$$${f}" | grep -qE 'rpath.*?$$($(2)_RPATH_PREFIX)ORIGIN' || continue ; \
   $(HOST_DIR)/usr/bin/chrpath -r '$$$$ORIGIN/../lib' "$$$${f}" ; \
  done
 endef
