@@ -187,11 +187,11 @@ for f in $(find "${BR2_HOST_DIR}" -type f -a '(' -path '*/usr/lib/*' -o -path '*
   file "${f}" | grep -q "${f}: ELF" || continue
   do_scan_elffile "${f}"
   result=$?
-  echo "${f}"
   # echo
   # ${BR2_HOST_DIR}/usr/bin/chrpath -l "${f}" 2>/dev/null | sed -e 's/: RPATH=/\n  /' -e 's/:/\n  /g'; continue
-  readelf -d "${f}" | grep rpath | \
-        sed -e 's/.*\?\[\(.*\?\)\]$/\1/' -e 's/:/\n  /g' -e 's/^\(.*\)/  \1/g'
+  bin_rpath="$(readelf -d "${f}" | grep rpath | \
+        sed -e 's/.*\?\[\(.*\?\)\]$/\1/' -e 's/:/\n  /g' -e 's/^\(.*\)/  \1/g')"
+  printf "%-60s : %s\n" "${f##*output/}" "${bin_rpath}"
   continue
   case "${ACTION}" in
     'check')
