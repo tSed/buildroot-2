@@ -31,3 +31,9 @@ Here is what needs to be done to make the HOST-directory a relocatable SDK
   if the directory it is executed in doesn't match the location of
   host/usr/share/buildroot/location. We haven't discussed how this could work
   with internal and crosstool-NG toolchains, though.
+
+
+References
+==========
+
+* http://lists.busybox.net/pipermail/buildroot/2012-February/050371.html
