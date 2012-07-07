@@ -53,9 +53,7 @@ endif
 
 HOST_LIBGLIB2_CONF_OPT = \
 		--disable-gtk-doc \
-		--enable-debug=no
-
-HOST_LIBGLIB2_MAKE_ENV += DESTDIR="$(HOST_DIR)"
+		--enable-debug=no \
 
 LIBGLIB2_DEPENDENCIES = \
 	host-pkg-config \
