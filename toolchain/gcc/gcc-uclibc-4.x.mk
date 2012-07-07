@@ -324,6 +324,7 @@ endif
 gcc_initial=$(GCC_BUILD_DIR1)/.installed
 $(gcc_initial) $(HOST_DIR)/usr/bin/$(GNU_TARGET_NAME)-gcc: $(GCC_BUILD_DIR1)/.compiled
 	PATH=$(TARGET_PATH) $(MAKE) -C $(GCC_BUILD_DIR1) install-gcc
+	$(call CHRPATH)
 	touch $(gcc_initial)
 
 gcc_initial: $(GCC_HOST_PREREQ) host-binutils $(HOST_DIR)/usr/bin/$(GNU_TARGET_NAME)-gcc
@@ -395,6 +396,7 @@ ifeq ($(BR2_GCC_SUPPORTS_FINEGRAINEDMTUNE),y)
 else
 	PATH=$(TARGET_PATH) $(MAKE) -C $(GCC_BUILD_DIR2) install-gcc
 endif
+	$(call CHRPATH)
 	touch $(gcc_intermediate)
 
 gcc_intermediate: uclibc-configured $(HOST_DIR)/usr/bin/$(GNU_TARGET_NAME)-gcc
@@ -516,6 +518,7 @@ ifeq ($(BR2_GCC_ENABLE_OPENMP),y)
 	-$(STRIPCMD) $(STRIP_STRIP_UNNEEDED) $(TARGET_DIR)/usr/lib/libgomp.so*
 endif
 	mkdir -p $(@D)
+	$(call CHRPATH)
 	touch $@
 
 cross_compiler:=$(HOST_DIR)/usr/bin/$(GNU_TARGET_NAME)-gcc

@@ -204,6 +204,9 @@ $(GDB_HOST_DIR)/gdb/gdb: $(GDB_HOST_DIR)/.configured
 $(TARGET_CROSS)gdb: $(GDB_HOST_DIR)/gdb/gdb
 	install -c $(GDB_HOST_DIR)/gdb/gdb $(TARGET_CROSS)gdb
 	ln -snf $(@F) $(HOST_DIR)/usr/bin/$(ARCH)-linux-gdb
+	$(call CHRPATH)
+
+gdbhost-install: $(GDB_HOST_DIR)/.stamp_gdbhost_installed
 
 gdbhost: host-expat $(TARGET_CROSS)gdb
 
