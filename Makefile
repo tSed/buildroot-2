@@ -503,6 +503,27 @@ external-deps:
 show-targets:
 	@echo $(TARGETS)
 
+show-host-rpath:
+	@$(call MESSAGE,"Checking rpath")
+	@echo Scanning $(HOST_DIR) ...
+	@-find $(HOST_DIR) \
+		-type f \
+		-a '!' '(' -path '*/$(STAGING_SUBDIR)/*' \
+			$(CHRPATH_FIND_FILTER_DIR) ')' \
+		-exec sh -c \
+			'file "{}" | grep -qE "ELF.*?, dynamically linked" && \
+			readelf -d "{}" | grep -qE "rpath.*?ORIGIN" && \
+			( \
+			res=$$(readelf -d "{}" | grep rpath | \
+				sed -e "s/.*\?\[\(.*\?\)\].*/\1/" -e "s/:/ /g") ; \
+			printf "%-100s : " "{}" ; \
+			if ! echo $${res} | grep -q "\$$ORIGIN/../lib" ; then \
+				printf "non-relocatable" ; \
+			fi ; \
+			printf "\n" ; \
+			printf "  %s\n" $${res} \
+			)' ';'
+
 else # ifeq ($(BR2_HAVE_DOT_CONFIG),y)
 
 all: menuconfig
