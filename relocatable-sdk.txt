@@ -1,0 +1,39 @@
+Here is what needs to be done to make the HOST-directory a relocatable SDK
+==========================================================================
+
+* Make sure that all binaries and libraries built for the host are built with a
+  rpath pointing to host/usr/lib. Normally, this should already be the case, but
+  it's worth checking.
+
+* Change the rpath value to $ORIGIN/../lib instead of the current absolute path
+  $(O)/host/usr/lib.
+
+* Modify the compiler wrapper program of external toolchains so that instead of
+  using a fixed location for the compiler tools, it deduces their location in a
+  relative manner from its current location.
+
+* Modify/patch pkg-config so that instead of having a fixed location for the
+  PKG_CONFIG_PATH and PKG_CONFIG_SYSROOT_DIR, those are deduced from the
+  location of the pkg-config binary. This will allow a pkg-config binary that
+  has been moved to still operate properly, without having to set any
+  environment variable.
+
+* Write a shell script, installed in host/usr/bin, which would mungle the
+  libtool .la files, the qmake.conf file and the CMake toolchain file to set the
+  correct path. This script reads a file
+  (can be host/usr/share/buildroot/location) which contains the original
+  location of the SDK. This allows the script to do the right modifications on
+  all the libtool, qmake.conf and cmake files. Once this is done, the script
+  changes the host/usr/share/buildroot/location file so that it contains the new
+  location.
+
+* Modify the external toolchain wrapper so that it bails out and warns the user
+  if the directory it is executed in doesn't match the location of
+  host/usr/share/buildroot/location. We haven't discussed how this could work
+  with internal and crosstool-NG toolchains, though.
+
+
+References
+==========
+
+* http://lists.busybox.net/pipermail/buildroot/2012-February/050371.html
