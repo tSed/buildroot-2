@@ -92,3 +92,16 @@ define sep
 
 
 endef
+
+#
+# RPATH utility
+#
+
+# ADJUST_RPATH_DIR_FILTER contains path patterns, for which any matching
+# location should be skip from search.
+# This is useful to prevent changing rpath from any 3rd party software,
+# e.g. an external cross-toolchain.
+ADJUST_RPATH_DIR_FILTER  =
+ifneq ($(TOOLCHAIN_EXTERNAL_SUBDIR),)
+ADJUST_RPATH_DIR_FILTER += $(TOOLCHAIN_EXTERNAL_SUBDIR)
+endif
