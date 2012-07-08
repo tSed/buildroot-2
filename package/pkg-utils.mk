@@ -105,3 +105,34 @@ ADJUST_RPATH_DIR_FILTER  =
 ifneq ($(TOOLCHAIN_EXTERNAL_SUBDIR),)
 ADJUST_RPATH_DIR_FILTER += $(TOOLCHAIN_EXTERNAL_SUBDIR)
 endif
+
+# ADJUST_RPATH -- Fix RPATH in binary files
+#
+#  argument 1 root location of the search
+#             default: $(HOST_DIR)
+#  argument 2 wrong rpath prefix to match allowing the rpath substitution
+#             default: $(HOST_RPATH_PREFIX_DEFAULT)
+#
+#  Note: Any path matching $(ADJUST_RPATH_DIR_FILTER) is skip from search.
+ADJUST_RPATH_FIND_DIR_FILTER = \
+	$(foreach dir,$(ADJUST_RPATH_DIR_FILTER), -o -path $(dir))
+define ADJUST_RPATH
+	@$(call MESSAGE,"Adjusting rpath")
+	test -x $(CHRPATH)
+	test x$(1) != x && \
+		export _search_root=$(1) || \
+		export _search_root=$(HOST_DIR) ; \
+	test x$(2) != x && \
+		export _rpath_prefix=$(2) || \
+		export _rpath_prefix=$(HOST_RPATH_PREFIX_DEFAULT) ; \
+	find $${_search_root} \
+		-type f \
+		-a '!' '(' -path '*/$(STAGING_SUBDIR)/*' \
+			$(foreach dir,$(ADJUST_RPATH_DIR_FILTER), -o -path $(dir)) ')' \
+		-exec sh -c \
+			'file "{}" | \
+			grep -qE ": ELF.*?, dynamically linked" && \
+			readelf -d "{}" | \
+			grep -qE "rpath.*?$${_rpath_prefix}ORIGIN" && \
+			$(CHRPATH) -r "\$$ORIGIN/../lib" "{}"' ';'
+endef
