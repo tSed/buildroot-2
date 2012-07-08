@@ -16,14 +16,12 @@
 [FROM] := a b c d e f g h i j k l m n o p q r s t u v w x y z . -
 [TO]   := A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _ _
 
-UPPERCASE = \
-	$(strip $(eval __tmp := $1) \
-		$(foreach c, $(join $(addsuffix :,$([FROM])),$([TO])), \
-			$(eval __tmp :=	\
-				$(subst $(word 1,$(subst :, ,$c)),\
-					$(word 2,$(subst :, ,$c)),\
-					$(__tmp)))) \
-		$(__tmp))
+UPPERCASE = $(strip $(eval __tmp := $1) \
+     $(foreach c, $(join $(addsuffix :,$([FROM])),$([TO])), \
+	$(eval __tmp :=	\
+		$(subst $(word 1,$(subst :, ,$c)),$(word 2,$(subst :, ,$c)),\
+			$(__tmp)))) \
+     $(__tmp))
 
 #
 # Manipulation of .config files based on the Kconfig
@@ -32,18 +30,18 @@ UPPERCASE = \
 #
 
 define KCONFIG_ENABLE_OPT
-	$(SED) "/\\<$(1)\\>/d" $(2)
-	echo "$(1)=y" >> $(2)
+       $(SED) "/\\<$(1)\\>/d" $(2)
+       echo "$(1)=y" >> $(2)
 endef
 
 define KCONFIG_SET_OPT
-	$(SED) "/\\<$(1)\\>/d" $(3)
-	echo "$(1)=$(2)" >> $(3)
+       $(SED) "/\\<$(1)\\>/d" $(3)
+       echo "$(1)=$(2)" >> $(3)
 endef
 
 define KCONFIG_DISABLE_OPT
-	$(SED) "/\\<$(1)\\>/d" $(2)
-	echo "# $(1) is not set" >> $(2)
+       $(SED) "/\\<$(1)\\>/d" $(2)
+       echo "# $(1) is not set" >> $(2)
 endef
 
 # Helper functions to determine the name of a package and its
@@ -53,15 +51,15 @@ endef
 # pkgdir macro is carefully written to handle the case of the Linux
 # package, for which the package directory is an empty string.
 define pkgdir
-	$(dir $(lastword $(MAKEFILE_LIST)))
+$(dir $(lastword $(MAKEFILE_LIST)))
 endef
 
 define pkgname
-	$(lastword $(subst /, ,$(call pkgdir)))
+$(lastword $(subst /, ,$(call pkgdir)))
 endef
 
 define pkgparentdir
-	$(patsubst %$(call pkgname)/,%,$(call pkgdir))
+$(patsubst %$(call pkgname)/,%,$(call pkgdir))
 endef
 
 # Define extractors for different archive suffixes
