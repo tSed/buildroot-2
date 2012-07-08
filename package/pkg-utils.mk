@@ -133,6 +133,7 @@ endif
 #  Note: Any path matching $(ADJUST_RPATH_DIR_FILTER) is skip from search.
 
 define ADJUST_RPATH
+	@$(call MESSAGE,"Adjusting rpath")
 	test -x $(CHRPATH)
 	test x$(1) != x && \
 		export _search_root=$(1) || \
