@@ -478,7 +478,7 @@ else
 # Automatically add host-chrpath dependency and the rpath fix post-build hook to
 # any host package, but chrpath itself.
 
-$(2)_DEPENDENCIES += host-chrpath
+$(2)_DEPENDENCIES += $(BASE_HOST_TARGETS)
 $(2)_RPATH_PREFIX = $(HOST_RPATH_PREFIX_DEFAULT)
 
 define $(2)_POST_INSTALL_CHRPATH

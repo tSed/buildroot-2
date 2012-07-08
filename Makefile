@@ -210,9 +210,10 @@ GNU_HOST_NAME:=$(shell support/gnuconfig/config.guess)
 ##############################################################
 
 ifeq ($(BR2_CCACHE),y)
-BASE_TARGETS += host-ccache
+BASE_HOST_TARGETS += host-ccache
 endif
-BASE_TARGETS += host-chrpath
+BASE_HOST_TARGETS += host-chrpath
+BASE_TARGETS += $(BASE_HOST_TARGETS)
 
 ifeq ($(BR2_TOOLCHAIN_BUILDROOT),y)
 BASE_TARGETS += uclibc-configured host-binutils cross_compiler uclibc-target-utils kernel-headers
