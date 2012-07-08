@@ -119,10 +119,8 @@ endef
 # location should be skip from search.
 # This is useful to prevent changing rpath from any 3rd party software,
 # e.g. an external cross-toolchain.
-ADJUST_RPATH_DIR_FILTER  =
-ifneq ($(TOOLCHAIN_EXTERNAL_SUBDIR),)
-ADJUST_RPATH_DIR_FILTER += $(TOOLCHAIN_EXTERNAL_SUBDIR)
-endif
+ADJUST_RPATH_DIR_FILTER += $(STAGING_SUBDIR) \
+	$(TOOLCHAIN_EXTERNAL_SUBDIR)
 
 # ADJUST_RPATH -- Fix RPATH in binary files
 #
@@ -132,9 +130,7 @@ endif
 #             default: $(HOST_RPATH_PREFIX_DEFAULT)
 #
 #  Note: Any path matching $(ADJUST_RPATH_DIR_FILTER) is skip from search.
-
 define ADJUST_RPATH
-	@$(call MESSAGE,"Adjusting rpath")
 	test -x $(CHRPATH)
 	test x$(1) != x && \
 		export _search_root=$(1) || \
@@ -142,14 +138,9 @@ define ADJUST_RPATH
 	test x$(2) != x && \
 		export _rpath_prefix=$(2) || \
 		export _rpath_prefix=$(HOST_RPATH_PREFIX_DEFAULT) ; \
-	find $${_search_root} \
-		-type f \
-		-a '!' '(' -path '*/$(STAGING_SUBDIR)/*' \
-			$(foreach dir,$(ADJUST_RPATH_DIR_FILTER), -o -path $(dir)) ')' \
-		-exec sh -c \
-			'file "{}" | \
-			grep -qE ": ELF.*?, dynamically linked" && \
-			readelf -d "{}" | \
-			grep -qE "rpath.*?$${_rpath_prefix}ORIGIN" && \
+	find $${_search_root} -type f \
+		-a '!' '(' $(call notfirstword,$(patsubst %,-o -path '*/%/*',$(ADJUST_RPATH_DIR_FILTER))) ')' \
+		-exec sh -c 'file "{}" | grep -qE ": ELF.*?, dynamically linked" && \
+			readelf -d "{}" | grep -qE "rpath.*?$${_rpath_prefix}ORIGIN" && \
 			$(CHRPATH) -r "\$$ORIGIN/../lib" "{}"' ';'
 endef
