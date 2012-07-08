@@ -44,6 +44,9 @@ endef
 HOST_CCACHE_POST_CONFIGURE_HOOKS += \
 	HOST_CCACHE_PATCH_CONFIGURATION
 
+HOST_CCACHE_FIX_RPATH_USING_CHRPATH = NO
+HOST_CCACHE_RPATH_PREFIX = \\\$$\\\$$
+
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
 
@@ -51,4 +54,3 @@ ifeq ($(BR2_CCACHE),y)
 ccache-stats: host-ccache
 	$(Q)$(CCACHE) -s
 endif
-
