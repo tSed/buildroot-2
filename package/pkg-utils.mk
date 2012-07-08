@@ -134,7 +134,6 @@ endif
 ADJUST_RPATH_FIND_DIR_FILTER = \
 	$(foreach dir,$(ADJUST_RPATH_DIR_FILTER), -o -path $(dir))
 define ADJUST_RPATH
-	@$(call MESSAGE,"Adjusting rpath")
 	test -x $(CHRPATH)
 	test x$(1) != x && \
 		export _search_root=$(1) || \
