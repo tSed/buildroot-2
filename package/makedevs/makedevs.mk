@@ -21,9 +21,11 @@ define MAKEDEVS_UNINSTALL_TARGET_CMDS
 	rm -f $(TARGET_DIR)/usr/sbin/makedevs
 endef
 
+HOST_MAKEDEVS_LDFLAGS = \
+	$(subst $(HOST_RPATH_PREFIX_DEFAULT)ORIGIN,$$ORIGIN,$(HOST_LDFLAGS))
 
 define HOST_MAKEDEVS_BUILD_CMDS
-	$(HOSTCC) $(HOST_CFLAGS) $(HOST_LDFLAGS) \
+	$(HOSTCC) $(HOST_CFLAGS) $(HOST_MAKEDEVS_LDFLAGS) \
 		package/makedevs/makedevs.c -o $(@D)/makedevs
 endef
 
