@@ -441,6 +441,7 @@ $(HOST_DIR)/usr/bin/ext-toolchain-wrapper: $(STAMP_DIR)/ext-toolchain-installed
 	done ;
 	$(HOSTCC) $(HOST_CFLAGS) $(TOOLCHAIN_EXTERNAL_WRAPPER_ARGS) -s \
 		toolchain/toolchain-external/ext-toolchain-wrapper.c -o $@
+	$(call ADJUST_RPATH)
 
 # 'uclibc' is the target to provide toolchain / staging dir
 uclibc: dependencies $(HOST_DIR)/usr/bin/ext-toolchain-wrapper

@@ -97,17 +97,31 @@ endef
 
 
 
+ADJUST_RPATH_DIR_FILTER  =
+ifneq ($(TOOLCHAIN_EXTERNAL_SUBDIR),)
+ADJUST_RPATH_DIR_FILTER += $(TOOLCHAIN_EXTERNAL_SUBDIR)
+endif
 
+ADJUST_RPATH_FIND_DIR_FILTER = \
+	$(foreach dir,$(ADJUST_RPATH_DIR_FILTER), -o -path $(dir))
 
-define CHRPATH
- @$(call MESSAGE,"Adjusting rpath")
- test -x $(HOST_DIR)/usr/bin/chrpath
- test x$(1) != x && export _search_root=$(1)  || export _search_root=$(HOST_DIR) ; \
- test x$(2) != x && export _rpath_prefix=$(2) || export _rpath_prefix=$(HOST_RPATH_PREFIX_DEFAULT) ; \
- for f in $$(find $${_search_root} -type f -a  '!' -path '*/$(STAGING_SUBDIR)/*' -a \
-   '!' -path '*/$(TOOLCHAIN_EXTERNAL_SUBDIR)/*' -print) ; do \
-  file "$${f}" | grep -qE ": ELF.*?, dynamically linked" || continue ; \
-  readelf -d "$${f}" | grep -qE "rpath.*?$${_rpath_prefix}ORIGIN" || continue ; \
-  $(HOST_DIR)/usr/bin/chrpath -r '$$ORIGIN/../lib' "$${f}" ; \
- done
+define ADJUST_RPATH
+	@$(call MESSAGE,"Adjusting rpath")
+	test -x $(HOST_DIR)/usr/bin/chrpath
+	test x$(1) != x && \
+		export _search_root=$(1) || \
+		export _search_root=$(HOST_DIR) ; \
+	test x$(2) != x && \
+		export _rpath_prefix=$(2) || \
+		export _rpath_prefix=$(HOST_RPATH_PREFIX_DEFAULT) ; \
+	find $${_search_root} \
+		-type f \
+		-a '!' '(' -path '*/$(STAGING_SUBDIR)/*' \
+			$(CHRPATH_FIND_FILTER_DIR) ')' \
+		-exec sh -c \
+			'file "{}" | \
+			grep -qE ": ELF.*?, dynamically linked" && \
+			readelf -d "{}" | \
+			grep -qE "rpath.*?$${_rpath_prefix}ORIGIN" && \
+			$(CHRPATH) -r "\$$ORIGIN/../lib" "{}"' ';'
 endef
