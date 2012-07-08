@@ -50,6 +50,9 @@ $(2)_CLEAN_OPT			?= clean
 $(2)_SRCDIR			= $$($(2)_DIR)/$($(2)_SUBDIR)
 $(2)_BUILDDIR			= $$($(2)_SRCDIR)
 
+# for host package only
+$(2)_FIX_RPATH                  = NO
+
 #
 # Configure step. Only define it if not already defined by the package
 # .mk file. And take care of the differences between host and target
@@ -83,7 +86,7 @@ define $(2)_CONFIGURE_CMDS
 		-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE="BOTH" \
 		-DCMAKE_INSTALL_PREFIX="$$(HOST_DIR)/usr" \
 		-DCMAKE_SKIP_RPATH=OFF \
-		-DCMAKE_INSTALL_RPATH=$(HOST_DIR)/usr/lib \
+		-DCMAKE_INSTALL_RPATH="$$ORIGIN/../lib" \
 		$$($$(PKG)_CONF_OPT) \
 	)
 endef

@@ -309,6 +309,14 @@ $(2)_INSTALL_IMAGES		?= NO
 $(2)_INSTALL_TARGET		?= YES
 $(2)_DIR_PREFIX			= $(if $(4),$(4),$(TOP_SRCDIR)/package)
 
+# The following flag is only used by host packages.
+# For most of those packages, except at least the CMake-based ones, it is not
+# easy to correctly set the rpath in the LDFLAGS, then this is handled in a
+# post-build hook.
+$(2)_FIX_RPATH			?= NO
+$(2)_FIX_RPATH_POST_BUILD	?= NO
+$(2)_RPATH_PREFIX		?= $$$$$$$$
+
 # define sub-target stamps
 $(2)_TARGET_INSTALL_TARGET =	$$($(2)_DIR)/.stamp_target_installed
 $(2)_TARGET_INSTALL_STAGING =	$$($(2)_DIR)/.stamp_staging_installed
@@ -542,6 +550,42 @@ endif # SITE_METHOD
 DL_TOOLS_DEPENDENCIES += $(firstword $(INFLATE$(suffix $($(2)_SOURCE))))
 
 endif # $(2)_KCONFIG_VAR
+
+# Hook to fix RPATH on host package if needed.
+ifeq ($$($(2)_TYPE) $$($(2)_FIX_RPATH),host YES)
+
+# Choose the method:
+ifneq ($$($(2)_FIX_RPATH_POST_BUILD),YES)
+# Set the rpath prefix to get '$ORIGIN/../lib' at the end of the configure step.
+
+define $(2)_POST_CONFIGURE_FIX_RPATH
+ @$$(call MESSAGE,"Adjusting rpath")
+ find $$($(2)_BUILDDIR) -type f -exec \
+  $(SED) "s;\(-Wl,-rpath,'\).*\?\(/../lib'\);\1$$($(2)_RPATH_PREFIX)ORIGIN\2;g" '{}' ';'
+endef
+
+$(2)_POST_CONFIGURE_HOOKS += $(2)_POST_CONFIGURE_FIX_RPATH
+
+else
+# Or use chrpath to fix it as a post-install hook.
+# This method may be usefull, especially for autotargets, for which it is
+#  necessary to escape '$' in the makefiles and the shell scripts.
+
+# Automatically add host-chrpath dependency and the rpath fix post-build hook to
+# any host package, but chrpath itself.
+
+$(2)_DEPENDENCIES += $(BASE_HOST_TARGETS)
+$(2)_RPATH_PREFIX = $(HOST_RPATH_PREFIX_DEFAULT)
+
+define $(2)_POST_INSTALL_CHRPATH
+ $$(call ADJUST_RPATH,$$(HOST_DIR),$$($(2)_RPATH_PREFIX))
+endef
+
+$(2)_POST_INSTALL_HOOKS += $(2)_POST_INSTALL_CHRPATH
+
+endif # RPATH fixing method choice
+endif # RPATH fixing
+
 endef # inner-generic-package
 
 ################################################################################
