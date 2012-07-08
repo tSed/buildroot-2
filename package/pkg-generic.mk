@@ -577,11 +577,12 @@ else
 $(2)_DEPENDENCIES += $(BASE_HOST_TARGETS)
 $(2)_RPATH_PREFIX = $(HOST_RPATH_PREFIX_DEFAULT)
 
-define $(2)_POST_INSTALL_CHRPATH
+define $(2)_POST_INSTALL_FIX_RPATH
+ @$$(call MESSAGE,"Adjusting rpath")
  $$(call ADJUST_RPATH,$$(HOST_DIR),$$($(2)_RPATH_PREFIX))
 endef
 
-$(2)_POST_INSTALL_HOOKS += $(2)_POST_INSTALL_CHRPATH
+$(2)_POST_INSTALL_HOOKS += $(2)_POST_INSTALL_FIX_RPATH
 
 endif # RPATH fixing method choice
 endif # RPATH fixing
