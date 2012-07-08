@@ -131,8 +131,7 @@ endif
 #             default: $(HOST_RPATH_PREFIX_DEFAULT)
 #
 #  Note: Any path matching $(ADJUST_RPATH_DIR_FILTER) is skip from search.
-ADJUST_RPATH_FIND_DIR_FILTER = \
-	$(foreach dir,$(ADJUST_RPATH_DIR_FILTER), -o -path $(dir))
+
 define ADJUST_RPATH
 	test -x $(CHRPATH)
 	test x$(1) != x && \
