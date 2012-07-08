@@ -552,6 +552,7 @@ $(HOST_DIR)/usr/bin/ext-toolchain-wrapper: $(TOOLCHAIN_EXTERNAL_INSTALL)
 	# the generated binary with older platforms
 	$(HOSTCC) $(HOST_CFLAGS) $(TOOLCHAIN_EXTERNAL_WRAPPER_ARGS) -s -Wl,--hash-style=both \
 		toolchain/toolchain-external/ext-toolchain-wrapper.c -o $@
+	$(call ADJUST_RPATH)
 
 toolchain-external: dependencies $(HOST_DIR)/usr/bin/ext-toolchain-wrapper
 
