@@ -95,14 +95,13 @@ endef
 
 
 
+# chrpath utility
 ADJUST_RPATH_DIR_FILTER  =
 ifneq ($(TOOLCHAIN_EXTERNAL_SUBDIR),)
 ADJUST_RPATH_DIR_FILTER += $(TOOLCHAIN_EXTERNAL_SUBDIR)
 endif
-
 ADJUST_RPATH_FIND_DIR_FILTER = \
 	$(foreach dir,$(ADJUST_RPATH_DIR_FILTER), -o -path $(dir))
-
 define ADJUST_RPATH
 	@$(call MESSAGE,"Adjusting rpath")
 	test -x $(HOST_DIR)/usr/bin/chrpath
