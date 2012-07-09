@@ -602,12 +602,8 @@ show-targets:
 show-host-rpath:
 	@$(call MESSAGE,"Checking rpath")
 	@echo Scanning $(HOST_DIR) ...
-	@-find $(HOST_DIR) \
-		-type f \
-		-a '!' '(' -path '*/$(STAGING_SUBDIR)/*' \
-			$(foreach dir,$(ADJUST_RPATH_DIR_FILTER),\
-				-o -path $(dir)) \
-			')' \
+	@-find $(HOST_DIR) -type f \
+		-a '!' '(' $(call notfirstword,$(patsubst %,-o -path '*/%/*',$(ADJUST_RPATH_DIR_FILTER))) ')' \
 		-exec sh -c \
 			'file "{}" | grep -qE "ELF.*?, dynamically linked" && \
 			readelf -d "{}" | grep -qE "rpath.*?ORIGIN" && \
