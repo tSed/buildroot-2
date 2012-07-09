@@ -132,12 +132,8 @@ ADJUST_RPATH_DIR_FILTER += $(STAGING_SUBDIR) \
 #  Note: Any path matching $(ADJUST_RPATH_DIR_FILTER) is skip from search.
 define ADJUST_RPATH
 	test -x $(CHRPATH)
-	test x$(1) != x && \
-		export _search_root=$(1) || \
-		export _search_root=$(HOST_DIR) ; \
-	test x$(2) != x && \
-		export _rpath_prefix=$(2) || \
-		export _rpath_prefix=$(HOST_RPATH_PREFIX_DEFAULT) ; \
+	test x$(1) != x && _search_root=$(1)  || _search_root=$(HOST_DIR) ; \
+	test x$(2) != x && _rpath_prefix=$(2) || _rpath_prefix=$(HOST_RPATH_PREFIX_DEFAULT) ; \
 	find $${_search_root} -type f \
 		-a '!' '(' $(call notfirstword,$(patsubst %,-o -path '*/%/*',$(ADJUST_RPATH_DIR_FILTER))) ')' \
 		-exec sh -c 'file "{}" | grep -qE ": ELF.*?, dynamically linked" && \
