@@ -1,0 +1,21 @@
+diff -rpuN host-libecore-1.1.0.orig/src/lib/ecore/ecore_exe.c host-libecore-1.1.0/src/lib/ecore/ecore_exe.c
+--- host-libecore-1.1.0.orig/src/lib/ecore/ecore_exe.c	2012-07-13 21:37:03.634377586 +0200
++++ host-libecore-1.1.0/src/lib/ecore/ecore_exe.c	2012-07-13 21:38:51.307127607 +0200
+@@ -2,8 +2,10 @@
+ # include <config.h>
+ #endif
+ 
+-#if defined (__FreeBSD__) || defined (__OpenBSD__) || defined (__NetBSD__)
+-# include <sys/time.h>
++#if defined (__FreeBSD__) || defined (__OpenBSD__) || defined (__NetBSD__) || defined(__linux__)
++# if ! defined(__linux__)
++#  include <sys/time.h>
++# endif
+ # include <sys/resource.h>
+ #endif
+ 
+@@ -1877,4 +1879,3 @@ _ecore_exe_dead_attach(Ecore_Exe *exe)
+       exe->doomsday_clock_dead = dead;
+    }
+ }
+-
