@@ -138,5 +138,5 @@ define ADJUST_RPATH
 		-a '!' '(' $(call notfirstword,$(patsubst %,-o -path '*/%/*',$(ADJUST_RPATH_DIR_FILTER))) ')' \
 		-exec sh -c 'file "{}" | grep -qE ": ELF.*?, dynamically linked" && \
 			readelf -d "{}" | grep -qE "rpath.*?[^\$$]ORIGIN" && \
-			$(CHRPATH) -r "\$$ORIGIN/../lib" "{}" 2>&1 | tee -a $(3)' ';'
+			( echo "{}" ; $(CHRPATH) -r "\$$ORIGIN/../lib" "{}" 2>&1 | tee -a $(3) )' ';'
 endef
