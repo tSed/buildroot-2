@@ -134,9 +134,9 @@ define ADJUST_RPATH
 	test -x $(CHRPATH)
 	test x$(1) != x && _search_root=$(1)  || _search_root=$(HOST_DIR) ; \
 	test x$(2) != x && _rpath_prefix=$(2) || _rpath_prefix=$(HOST_RPATH_PREFIX_DEFAULT) ; \
-	find $${_search_root} -type f \
+	find $${_search_root} -type f -a '(' '!' -path $(CHRPATH) ')' \
 		-a '!' '(' $(call notfirstword,$(patsubst %,-o -path '*/%/*',$(ADJUST_RPATH_DIR_FILTER))) ')' \
 		-exec sh -c 'file "{}" | grep -qE ": ELF.*?, dynamically linked" && \
-			readelf -d "{}" | grep -qE "rpath.*?$${_rpath_prefix}ORIGIN" && \
-			$(CHRPATH) -r "\$$ORIGIN/../lib" "{}"' ';'
+			readelf -d "{}" | grep -qE "rpath.*?[^\$$]ORIGIN" && \
+			$(CHRPATH) -r "\$$ORIGIN/../lib" "{}" 2>&1 | tee -a $(3)' ';'
 endef
