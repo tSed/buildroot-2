@@ -1,5 +1,15 @@
 --- a/ltmain.sh	2009-11-16 06:23:18.000000000 -0700
 +++ b/ltmain.sh	2010-09-18 20:25:06.000000000 -0700
+@@ -362,6 +362,9 @@ case $progpath in
+      ;;
+ esac
+ 
++# Assume libtool script is loacted at the root of the buoild directory
++top_builddir="$progdir"
++
+ # Sed substitution that helps us do robust quoting.  It backslashifies
+ # metacharacters that are still active within double-quoted strings.
+ Xsed="${SED}"' -e 1s/^X//'
 @@ -1048,8 +1048,8 @@ func_infer_tag ()
  	# was found and let the user know that the "--tag" command
  	# line option must be used.
@@ -51,6 +61,42 @@
  	    fi
  	    ;;
  	  esac
+@@ -7223,6 +7226,11 @@ EOF
+ 	  rpath="$finalize_rpath"
+ 	  test "$mode" != relink && rpath="$compile_rpath$rpath"
+ 	  for libdir in $rpath; do
++	    # for rpath, skip any libdir pointing to the build directory
++	    case "$libdir" in
++	    "$top_builddir"*|"./"*|"../"*|*"/usr/$target_alias/lib"*|*"/usr/$host_alias/lib"*) continue ;;
++	    *) ;;
++	    esac
+ 	    if test -n "$hardcode_libdir_flag_spec"; then
+ 	      if test -n "$hardcode_libdir_separator"; then
+ 		if test -z "$hardcode_libdirs"; then
+@@ -7916,6 +7924,11 @@ EOF
+       rpath=
+       hardcode_libdirs=
+       for libdir in $compile_rpath $finalize_rpath; do
++	# for rpath, skip any libdir pointing to the build directory
++	case "$libdir" in
++	"$top_builddir"*|"./"*|"../"*|*"/usr/$target_alias/lib"*|*"/usr/$host_alias/lib"*) continue ;;
++	*) ;;
++	esac
+ 	if test -n "$hardcode_libdir_flag_spec"; then
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
+@@ -7967,6 +7980,11 @@ EOF
+       rpath=
+       hardcode_libdirs=
+       for libdir in $finalize_rpath; do
++	# for rpath, skip any libdir pointing to the build directory
++	case "$libdir" in
++	"$top_builddir"*|"./"*|"../"*|*"/usr/$target_alias/lib"*|*"/usr/$host_alias/lib"*) continue ;;
++	*) ;;
++	esac
+ 	if test -n "$hardcode_libdir_flag_spec"; then
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
 @@ -8052,6 +8061,10 @@ EOF
  	    # Replace all uninstalled libtool libraries with the installed ones
  	    newdependency_libs=

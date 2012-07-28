@@ -1,5 +1,16 @@
 --- a/ltmain.sh	2006-03-11 13:49:04.000000000 -0500
 +++ b/ltmain.sh	2008-04-30 09:55:28.000000000 -0400
+@@ -46,6 +46,10 @@ PACKAGE=libtool
+ VERSION=1.5.22
+ TIMESTAMP=" (1.1220.2.365 2005/12/18 22:14:06)"
+ 
++# Assume libtool script is loacted at the root of the buoild directory
++top_builddir=`echo "$progpath" | $SED "s,$progname$,,"`
++top_builddir=`cd "$top_builddir" && pwd`
++
+ # See if we are running on zsh, and set the options which allow our
+ # commands through without removal of \ escapes.
+ if test -n "${ZSH_VERSION+set}" ; then
 @@ -273,8 +273,9 @@ func_infer_tag ()
  	# line option must be used.
  	if test -z "$tagname"; then
@@ -38,6 +49,42 @@
  	  fi
  	  # This is a shared library
  
+@@ -3861,6 +3865,11 @@ EOF
+ 	  rpath="$finalize_rpath"
+ 	  test "$mode" != relink && rpath="$compile_rpath$rpath"
+ 	  for libdir in $rpath; do
++	    # for rpath, skip any libdir pointing to the build directory
++	    case "$libdir" in
++	    "$top_builddir"*|"./"*|"../"*|*"/usr/$target_alias/lib"*|*"/usr/$host_alias/lib"*) continue ;;
++	    *) ;;
++	    esac
+ 	    if test -n "$hardcode_libdir_flag_spec"; then
+ 	      if test -n "$hardcode_libdir_separator"; then
+ 		if test -z "$hardcode_libdirs"; then
+@@ -4409,6 +4418,11 @@ EOF
+       rpath=
+       hardcode_libdirs=
+       for libdir in $compile_rpath $finalize_rpath; do
++	# for rpath, skip any libdir pointing to the build directory
++	case "$libdir" in
++	"$top_builddir"*|"./"*|"../"*|*"/usr/$target_alias/lib"*|*"/usr/$host_alias/lib"*) continue ;;
++	*) ;;
++	esac
+ 	if test -n "$hardcode_libdir_flag_spec"; then
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
+@@ -4458,6 +4472,11 @@ EOF
+       rpath=
+       hardcode_libdirs=
+       for libdir in $finalize_rpath; do
++	# for rpath, skip any libdir pointing to the build directory
++	case "$libdir" in
++	"$top_builddir"*|"./"*|"../"*|*"/usr/$target_alias/lib"*|*"/usr/$host_alias/lib"*) continue ;;
++	*) ;;
++	esac
+ 	if test -n "$hardcode_libdir_flag_spec"; then
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
 @@ -5606,6 +5623,10 @@ fi\
  	    # Replace all uninstalled libtool libraries with the installed ones
  	    newdependency_libs=
