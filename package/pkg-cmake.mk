@@ -65,6 +65,7 @@ define $(2)_CONFIGURE_CMDS
 	$$($$(PKG)_CONF_ENV) $(HOST_DIR)/usr/bin/cmake $$($$(PKG)_SRCDIR) \
 		-DCMAKE_TOOLCHAIN_FILE="$$(HOST_DIR)/usr/share/buildroot/toolchainfile.cmake" \
 		-DCMAKE_INSTALL_PREFIX="/usr" \
+		-DCMAKE_SKIP_RPATH=ON \
 		$$($$(PKG)_CONF_OPT) \
 	)
 endef
@@ -81,6 +82,8 @@ define $(2)_CONFIGURE_CMDS
 		-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY="BOTH" \
 		-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE="BOTH" \
 		-DCMAKE_INSTALL_PREFIX="$$(HOST_DIR)/usr" \
+		-DCMAKE_SKIP_RPATH=OFF \
+		-DCMAKE_INSTALL_RPATH=$(HOST_DIR)/usr/lib \
 		$$($$(PKG)_CONF_OPT) \
 	)
 endef
