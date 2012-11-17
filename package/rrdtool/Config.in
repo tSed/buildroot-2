@@ -11,5 +11,13 @@ config BR2_PACKAGE_RRDTOOL
 
 	  http://oss.oetiker.ch/rrdtool/
 
+if BR2_PACKAGE_RRDTOOL
+
+config BR2_PACKAGE_RRDTOOL_PYTHON
+	bool "Python bindings"
+	depends on BR2_PACKAGE_PYTHON
+
+endif
+
 comment "rrdtool needs a toolchain w/ wchar"
 	depends on !BR2_USE_WCHAR

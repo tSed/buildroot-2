@@ -1,0 +1,29 @@
+Allow to override the python include directories.
+When cross-compiling python extensions, python headers must be taken from the
+staging directory, not the host one.
+
+This patch avoids to run into some weird, ununderstable error about LONG_BIT
+definition, especially when the build and the target machine have different
+bitwises.
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+
+--- rrdtool-1.2.30.orig/acinclude.m4	2012-11-17 11:33:40.194321803 +0100
++++ rrdtool-1.2.30/acinclude.m4	2012-11-17 12:18:12.490326127 +0100
+@@ -467,9 +467,13 @@ AC_MSG_CHECKING(for headers required to
+ dnl deduce PYTHON_INCLUDES
+ py_prefix=`$PYTHON -c "import sys; print sys.prefix"`
+ py_exec_prefix=`$PYTHON -c "import sys; print sys.exec_prefix"`
+-PYTHON_INCLUDES="-I${py_prefix}/include/python${PYTHON_VERSION}"
+-if test "$py_prefix" != "$py_exec_prefix"; then
+-  PYTHON_INCLUDES="$PYTHON_INCLUDES -I${py_exec_prefix}/include/python${PYTHON_VERSION}"
++if test "x$am_cv_python_includes" = "x" ; then
++  PYTHON_INCLUDES="-I${py_prefix}/include/python${PYTHON_VERSION}"
++  if test "$py_prefix" != "$py_exec_prefix"; then
++    PYTHON_INCLUDES="$PYTHON_INCLUDES -I${py_exec_prefix}/include/python${PYTHON_VERSION}"
++  fi
++else
++  PYTHON_INCLUDES="-I${am_cv_python_includes}"
+ fi
+ AC_SUBST(PYTHON_INCLUDES)
+ dnl check if the headers exist:
