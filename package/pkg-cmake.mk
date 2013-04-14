@@ -62,10 +62,15 @@ define $(2)_CONFIGURE_CMDS
 	rm -f CMakeCache.txt && \
 	$$($$(PKG)_CONF_ENV) $(HOST_DIR)/usr/bin/cmake $$($$(PKG)_SRCDIR) \
 		-DCMAKE_TOOLCHAIN_FILE="$$(HOST_DIR)/usr/share/buildroot/toolchainfile.cmake" \
-		-DCMAKE_INSTALL_PREFIX="/usr" \
-		-DCMAKE_COLOR_MAKEFILE=OFF \
-		-DBUILD_SHARED_LIBS=$(if $(BR2_PREFER_STATIC_LIB),OFF,ON) \
-		$$($$(PKG)_CONF_OPT) \
+		-DCMAKE_COLOR_MAKEFILE=OFF                                    \
+		-DCMAKE_BUILD_TYPE=$(if $(BR2_ENABLE_DEBUG),Debug,Release)    \
+		-DBUILD_SHARED_LIBS=$(if $(BR2_PREFER_STATIC_LIB),OFF,ON)     \
+		-DBUILD_DOCS=$(if $(BR2_HAVE_DOCUMENTATION),ON,OFF)           \
+		-DCMAKE_INSTALL_PREFIX="/usr"                                 \
+		-DCMAKE_SKIP_RPATH=ON                                         \
+		-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=OFF                       \
+		-DCMAKE_USE_RELATIVE_PATHS=OFF                                \
+		$$($$(PKG)_CONF_OPT)                                          \
 	)
 endef
 else
@@ -74,14 +79,23 @@ else
 define $(2)_CONFIGURE_CMDS
 	(cd $$($$(PKG)_BUILDDIR) && \
 	rm -f CMakeCache.txt && \
-	$(HOST_DIR)/usr/bin/cmake $$($$(PKG)_SRCDIR) \
-		-DCMAKE_INSTALL_SO_NO_EXE=0 \
-		-DCMAKE_FIND_ROOT_PATH="$$(HOST_DIR)" \
+	$(HOST_DIR)/usr/bin/cmake $$($$(PKG)_SRCDIR)   \
+		-DCMAKE_FIND_ROOT_PATH="$$(HOST_DIR)"      \
 		-DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM="BOTH" \
 		-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY="BOTH" \
 		-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE="BOTH" \
-		-DCMAKE_INSTALL_PREFIX="$$(HOST_DIR)/usr" \
-		$$($$(PKG)_CONF_OPT) \
+		-DCMAKE_BUILD_TYPE=Release                 \
+		-DBUILD_DOCS=OFF                           \
+		-DCMAKE_USE_RELATIVE_PATHS=OFF             \
+		-DCMAKE_INSTALL_SO_NO_EXE=OFF              \
+		-DBUILD_SHARED_LIBS=ON                     \
+		-DCMAKE_SKIP_RPATH=OFF                     \
+		-DCMAKE_INSTALL_RPATH='$$$$ORIGIN/../lib'  \
+		-DCMAKE_SKIP_BUILD_RPATH=ON                \
+		-DBUILD_WITH_INSTALL_RPATH=ON              \
+		-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=OFF    \
+		-DCMAKE_INSTALL_PREFIX="$$(HOST_DIR)/usr"  \
+		$$($$(PKG)_CONF_OPT)                       \
 	)
 endef
 endif
