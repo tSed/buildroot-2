@@ -571,8 +571,8 @@ else
 # This method may be usefull, especially for autotargets, for which it is
 #  necessary to escape '$' in the makefiles and the shell scripts.
 
-# Automatically add host-chrpath dependency and the rpath fix post-build hook to
-# any host package, but chrpath itself.
+# Automatically add host-patchelf dependency and the rpath fix post-build hook to
+# any host package
 
 $(2)_DEPENDENCIES += $(BASE_HOST_TARGETS)
 $(2)_RPATH_PREFIX = $(HOST_RPATH_PREFIX_DEFAULT)

@@ -17,6 +17,6 @@ endef
 HOST_CHRPATH_FIX_RPATH = NO
 HOST_CHRPATH_POST_BUILD_HOOKS += HOST_CHRPATH_POST_BUILD_FIX_RPATH
 
-$(eval $(call AUTOTARGETS,host))
+$(eval $(host-autotools-package))
 
 CHRPATH =$(HOST_DIR)/usr/bin/chrpath

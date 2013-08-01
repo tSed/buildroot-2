@@ -225,7 +225,7 @@ GNU_HOST_NAME:=$(shell support/gnuconfig/config.guess)
 ifeq ($(BR2_CCACHE),y)
 BASE_HOST_TARGETS += host-ccache
 endif
-BASE_HOST_TARGETS += host-chrpath
+BASE_HOST_TARGETS += host-patchelf
 BASE_TARGETS += $(BASE_HOST_TARGETS)
 
 ifeq ($(BR2_TOOLCHAIN_BUILDROOT),y)
