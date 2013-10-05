@@ -1,0 +1,291 @@
+// -*- mode:doc; -*-
+// vim: set syntax=asciidoc:
+
+[[deploying-images]]
+Deploying target images built with Buildroot
+============================================
+
+After having run Buildroot, you will have a brand new kernel,
+bootloader and filesystem for your target exported in the
+'output/images' directory.
+The content of this directory depends on the selected options in the
+Buildroot configuration, especially those from the +Kernel+,
++filesystem images+ and +bootloaders+ menus.
+
+You probably want to do one of the following:
+
+* Copy and install the images on the target device to boot and test it.
+
+* Write the images to removable media that can be booted on the target
+  device.
+
+* Boot and test the images...
+
+* deploy and/or install the freshly built images on the target to boot
+  and test it;
+
+* boot and test the images in emulators (http://wiki.qemu.org/Main_Page[Qemu],
+  http://www.linaro.org/engineering/engineering-projects/armv8[Foundation_v8]
+  --- an AArch64 emulator, ...);
+
+* generate a virtual disk to dump to real system or to use in
+  virtualization systems (http://wiki.qemu.org/Main_Page[Qemu],
+  https://www.virtualbox.org/[VirtualBox], ...).
+  This is mostly useful for 'i386' and 'x86_64' targets architecture.
+
+This part of the work is really depending on each project and
+hardware, so we cannot describe every solution here. This is where
+Buildroot's work ends. The rest of this chapter gives some general
+examples and hints about how the images can be deployed to the target
+device. This is _not_ an exact guide and doesn't provide full details.
+Please take the time to have a look to referred projects to get those
+details.
+
+
+Deploying images on the target hardware
+---------------------------------------
+
+Buildroot comes with a set of minimal configurations that allow to
+boot various existing targets, from different vendors.
+
+All these configurations are stored in the 'configs/' directory.
+Most of these configurations also come with a directory
+'board/<vendor name>/<platform name>', for additional resources.
+Some of them also contain a 'readme.txt' file with information about
+flashing and/or booting the given platform.
+
+Nevertheless, how to deploy the generated images on actual hardware is
+very board-specific. Buildroot cannot provide instructions for all
+boards, or even provide complete instructions for a single board.
+Please refer to the instructions provided by the target vendor.
+
+[WARNING]
+Be careful when flashing the images into the target, *the _board's_
+readme files coming within Buildroot are provided without warranty of
+any kind*.
+They are contributions from Buildroot users, but Buildroot developers
+do not ensure their correctness, nor maintain them.
+
+
+Deploying images over the network
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is common to boot the target over the network when dealing with
+embedded devices, whatever the reasons could be:
+
+* to speed-up the in-progress images test during the development
+  phase;
+* to avoid premature wear or the flash memory devices;
+* to deploy the actual production images on the hardware;
+* or because the target is not equipped with memory storage;
+* ...
+
+To achieve network-boot, there are several methods that depend on both
+the facility network infrastructure and the targets. Among these, the
+most common are:
+
+* TFTP boot
+* NFS boot
+* PXE boot (x86-specific)
+
+
+TFTP boot
+^^^^^^^^^
+
+Depending on the bootloader installed on the target, it may be
+possible to download the kernel image through the network, using the
+TFTP protocol, loading it in RAM, then jump into it.
+
+For further information, refer to the bootloader documentation.
+
+Here is some related documentation to TFTP server setup and TFTP boot:
+
+* http://www.linuxhomenetworking.com/wiki/index.php/Quick_HOWTO_:_Ch16_:_Telnet,_TFTP,_and_xinetd#TFTP
+* https://linuxlink.timesys.com/docs/linux_tftp
+* http://www.webune.com/forums/how-to-install-tftp-server-in-linux.html
+
+
+NFS boot
+^^^^^^^^
+
+Loading the kernel over NFS
++++++++++++++++++++++++++++
+
+Depending on the bootloader installed on the target, it may be
+possible to download the kernel image through the network, using the
+NFS protocol, loading it in RAM, then jump into it.
+
+For further information, refer to the bootloader documentation.
+
+[[deploying-images-nfs-links]]
+Here is some related documentation to NFS server setup and NFS boot:
+
+* http://tldp.org/HOWTO/NFS-HOWTO/index.html
+* https://www.kernel.org/doc/Documentation/filesystems/nfs/nfsroot.txt
+* https://wiki.archlinux.org/index.php/NFS
+* http://www.solid-run.com/mw/index.php/Setup_NFS_boot
+* http://wiki.openelec.tv/index.php?title=Network_Boot_-_NFS
+* http://www.armadeus.com/wiki/index.php?title=NFS
+
+NFS root filesystem mounted on +/+
+++++++++++++++++++++++++++++++++++
+
+The idea is to mount +/+ using a network shared folder from an
+http://tldp.org/HOWTO/NFS-HOWTO/index.html[NFS] server
+(usually on the host development machine).
+
+To enable the NFS boot, you should select the _tar root filesystem_
+option in the _Filesystem images_ menu.
+
+The target kernel needs at least the following options:
+
+* NFS filesystem support (+CONFIG_NFS_FS+);
+
+* Root filesystem on NFS (+CONFIG_ROOT_NFS+);
+
+* Ethernet (+CONFIG_NET_ETHERNET+);
+
+* The ethernet driver for the target network interface;
+
+* IP: kernel level autoconfiguration. This includes:
+
+  * +CONFIG_IP_PNP+;
+  * +CONFIG_IP_PNP_BOOTTP+;
+  * +CONFIG_IP_PNP_DHCP+.
+
+After a complete build, just run the following command to setup the
+NFS root directory on the server:
+
+-------------------
+sudo tar -xavf /path/to/output_dir/rootfs.tar -C /path/to/nfs_root_dir
+-------------------
+
+Make sure the NFS root location appears in the +/etc/exports+ file,
+and an NFS daemon is running on the server.
+
+After editing +/etc/exports+, you should run:
+
+-------------------
+sudo exportfs -ra
+-------------------
+
+To boot on a NFS root-filesystem, adjust the kernel command line
+parameters (see https://www.kernel.org/doc/Documentation/kernel-parameters.txt
+and the xref:deploying-images-nfs-links[above links]).
+
+For further information, refer to the
+xref:deploying-images-nfs-links[above links].
+
+
+Network PXE bootloader
+^^^^^^^^^^^^^^^^^^^^^^
+
+[NOTE]
+This section is mostly x86 target specific.
+
+To fully boot on the network you need a network bootloader. This is
+optional and you could use your classic bootloader to mount an NFS
+rootfs.
+
+http://download.intel.com/design/archives/wfm/downloads/pxespec.pdf[PXE]
+is a specification that has been implemented at least by
+http://www.syslinux.org/wiki/index.php/PXELINUX[PXELINUX] and
+http://ipxe.org/[iPXE].
+
+The main idea is to have a DHCP server that provides a link to a
+generic boot ROM that is accessible from a TFTP server.
+Then your target boots with it and comes back to the TFTP server to
+get the specific stuff (for instance its boot menu).
+
+Here are some hints on how to setup this:
+
+* http://www.digitalpeer.com/id/linuxnfs
+
+
+Deploying images on removable media
+-----------------------------------
+
+How the target device is close to the actual hardware, so Buildroot
+cannot provides any information how to achieve it for every single
+target. For boards that use the same processor as one of the boards
+supported by Buildroot, the 'readme.txt' can be a good starting point.
+
+In addition, Buildroot provides tools that run on your host that can
+help generating bootable media or booting a device over USB, serial or
+the network.
+
+[NOTE]
+Some of these tools are not really well documented, you may need to
+browse the source trees to find out how to use them.
+
+
+Preparing a bootable raw disk file for virtualization
+-----------------------------------------------------
+
+[NOTE]
+This section is mostly x86 target specific.
+
+If you plan to use virtual machines, or to copy a binary bootable
+image to your target, you may need to create a _disk image_.
+
+To create a bootable raw _disk image_ file, you will need to:
+
+* create an empty file with the +dd+ command;
+
+* edit the partition table of this _disk image_ file using some tools
+  like +fdisk+ (be careful when using +fdisk+; mis-usage can damage
+  the host machine. Look at its manpage before using it;
+
+* install the MBR;
+
+* create nodes in +/dev+ pointing to the _disk image_ and its
+  partitions (as you will have with +/dev/sda+, +/dev/sda1+,
+  +/dev/sda2+, etc) with
+  http://robert.penz.name/73/kpartx-a-tool-for-mounting-partitions-within-an-image-file/[kpartx];
+
+* mount one or several partitions of the _disk image_ with the +mount+
+  command;
+
+* populate the root partition by extracting into it the
+  root-filesystem tarball generated by Buildroot.
+
+
+Deploying images in emulators
+-----------------------------
+
+Buildroot comes with a set of configurations for various
+architectures running in http://wiki.qemu.org/Main_Page['Qemu'], or
+http://www.linaro.org/engineering/engineering-projects/armv8['Foundation_v8']
+(an AArch64 emulator).
+
+These configurations are stored under the 'board/qemu/<target name>'
+and 'board/arm/foundation-v8' directories.
+
+Each of these configurations has a 'defconfig' and comes with a
++readme.txt+ file providing details to use the built images with
+the emulator.
+
+They are regularly tested and maintained by the Buildroot core
+developers.
+
+If you built one of these configurations and have 'Qemu' or
+'Foundation_v8' installed on your host machine, booting the images
+should be straight forward.
+
+
+Chroot'ing into target image
+----------------------------
+
+If you want to 'chroot' in a generated image, then there are few things
+you should be aware of:
+
+* you should setup the new root from the _tar root filesystem_ image;
+
+* either the selected target architecture is compatible with your host
+  machine, or you should use some +qemu-*+ binary and correctly set it
+  within the +binfmt+ properties to be able to run the binaries built
+  for the target on your host machine;
+
+* Buildroot does not currently provide +host-qemu+ nor +binfmt+
+  correctly built and set for that kind of use. This usage is beyond
+  Buildroot scope.
