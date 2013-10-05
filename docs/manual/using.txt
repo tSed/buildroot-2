@@ -73,7 +73,8 @@ Buildroot output is stored in a single directory, +output/+.
 This directory contains several subdirectories:
 
 * +images/+ where all the images (kernel image, bootloader and root
-  filesystem images) are stored.
+  filesystem images) are stored. For further details for using/booting
+  the images, refer to xref:deploying-images[].
 
 * +build/+ where all the components except for the cross-compilation
   toolchain are built (this includes tools needed to run Buildroot on

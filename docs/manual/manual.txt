@@ -21,6 +21,8 @@ include::starting-up.txt[]
 
 include::working-with.txt[]
 
+include::deploying-images.txt[]
+
 include::faq-troubleshooting.txt[]
 
 include::known-issues.txt[]
@@ -30,8 +32,6 @@ include::going-further.txt[]
 include::developer-guide.txt[]
 
 include::legal-notice.txt[]
-
-include::beyond-buildroot.txt[]
 
 include::get-involved.txt[]
 
