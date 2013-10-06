@@ -1,8 +1,11 @@
+MANUAL_BUILDDIR = $(BUILD_DIR)/buildroot-manual
+
 # Packages included in BR2_EXTERNAL are not part of buildroot, so they
 # should not be included in the manual.
 manual-update-lists: manual-check-dependencies-lists
 	$(Q)$(call MESSAGE,"Updating the manual lists...")
-	$(Q)BR2_DEFCONFIG="" TOPDIR=$(TOPDIR) O=$(O)/docs/manual/.build \
+	$(Q)mkdir -p $(MANUAL_BUILDDIR)
+	$(Q)BR2_DEFCONFIG="" TOPDIR=$(TOPDIR) O=$(MANUAL_BUILDDIR) \
 		BR2_EXTERNAL=$(TOPDIR)/support/dummy-external \
 		python -B $(TOPDIR)/support/scripts/gen-manual-lists.py
 
@@ -59,11 +62,10 @@ $$(O)/docs/$(1)/$(1).$(4): docs/$(1)/$(1).txt \
 			   manual-check-dependencies-$(3) \
 			   manual-update-lists
 	$(Q)$(call MESSAGE,"Generating $(5) $(1)...")
-	$(Q)mkdir -p $$(@D)/.build
-	$(Q)rsync -au docs/$(1)/*.txt $$(@D)/.build
+	$(Q)mkdir -p $$(@D) $(MANUAL_BUILDDIR)
+	$(Q)rsync -au docs/$(1)/*.txt $(MANUAL_BUILDDIR)
 	$(Q)a2x $(6) -f $(2) -d book -L -r $(TOPDIR)/docs/images \
-	        -D $$(@D) $$(@D)/.build/$(1).txt
-	-$(Q)rm -rf $$(@D)/.build
+		-D $$(@D) $(MANUAL_BUILDDIR)/$(1).txt
 endef
 
 ################################################################################
@@ -82,7 +84,7 @@ $(call GENDOC_INNER,$(1),text,text,text,text)
 $(call GENDOC_INNER,$(1),epub,epub,epub,ePUB)
 clean: $(1)-clean
 $(1)-clean:
-	$(Q)$(RM) -rf $(O)/docs/$(1)
+	$(Q)$(RM) -rf $(O)/docs/$(1) $(MANUAL_BUILDDIR)
 .PHONY: $(1) $(1)-clean manual-update-lists
 endef
 
