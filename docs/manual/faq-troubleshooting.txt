@@ -211,3 +211,70 @@ On this matter, the Buildroot developers make this position statement:
    upgrades by upgrading the entire root filesystem image at once,
    the image deployed to the embedded system is guaranteed to really
    be the one that has been tested and validated.
+
+[[faq-how-to-avoid-rebuild-buildroot-toochain]]
+How to avoid rebuilding toolchain after +make clean+?
+-----------------------------------------------------
+
+Buildroot only builds the toolchain from sources when using the
+internal Buildroot toolchain backend.
+When the external toolchain backend is used, Buildroot just used it
+and populate the sysroot and the target tree by copying files from
+the toolchain.
+
+So, the easiest way to avoid rebuilding the toolchain is feeding a
+prebuilt one to the external toolchain backend.
+
+If you want to build and use your own toolchain, we recommend to use
+http://crosstool-ng.org[Crosstool-NG] to do so. Then just feed it as
+the prebuilt toolchain to the Buildroot's external toolchain backend.
+
+Otherwise, to avoid rebuilding the toolchain after executing +make
+clean+ (when using the internal Buildroot toolchain backend), you can
+build the toolchain in one location, then use this prebuilt toolchain.
+To do so, you can build the toolchain in some place, then use this
+prebuilt toolchain as an external toolchain in another Buildroot
+configuration. This section gives step-by-step instructions about how
+to do that:
+
+1. Configure the toolchain using the internal Buildroot toolchain
+   backend to meet your needs:
++
+---------------------------------------
+make O=/path/to/somewhere menuconfig
+---------------------------------------
++
+1. Build the toolchain:
++
+---------------------------------------
+make O=/path/to/somewhere toolchain
+---------------------------------------
++
+1. Configure target configuration using the prebuilt toolchain as an
+   'external toolchain':
++
+---------------------------------------
+make O=/path/to/somewhere_else menuconfig
+---------------------------------------
++
+In the 'Toolchain' menu, set:
++
+* 'Toolchain type': +External toolchain+ (+BR2_TOOLCHAIN_EXTERNAL+)
+* 'Toolchain': +Custom toolchain+ (+BR2_TOOLCHAIN_EXTERNAL_CUSTOM+)
+* 'Toolchain origin': +Pre-installed toolchain+
+  (+BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED+)
+* 'Toolchain path': +/path/to/somewhere/host/usr+
+  (+BR2_TOOLCHAIN_EXTERNAL_PATH+)
+* and set the external toolchain properties according to the ones set
+  for the prebuilt toolchain.
++
+1. Build the target binaries:
++
+---------------------------------------
+make O=/path/to/somewhere_else
+---------------------------------------
+
+Note that toolchains built using the internal Buildroot toolchain
+backend are *not* relocatable, so if you plan to use these toolchains
+on different machines, you will *have to* install it in the same
+location (i.e.: in +/path/to/somewhere+) on every machine.
