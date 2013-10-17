@@ -1,3 +1,9 @@
+WARNING: the below information will overwrite the platform bootloader.
+Therefore, make sure you have a known-working recovery mechanism for
+your platform, as we cannot guarantee that the new bootloader will
+work.
+______________________________________________________________________
+
 
 ******************** WARNING ********************
 The compiled U-Boot binary is intended for NAND flash only!

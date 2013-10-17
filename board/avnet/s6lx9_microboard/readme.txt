@@ -1,3 +1,10 @@
+WARNING: the below information will overwrite the platform bootloader.
+Therefore, make sure you have a known-working recovery mechanism for
+your platform, as we cannot guarantee that the new bootloader will
+work.
+______________________________________________________________________
+
+
 This is the buildroot board support for the Avnet Spartan6 LX9 MicroBoard.
 
 The Avnet S6LX9 Microboard is a small USB-Stick sized module containing
