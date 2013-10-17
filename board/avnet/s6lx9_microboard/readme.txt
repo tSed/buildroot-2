@@ -1,3 +1,13 @@
+*************************  /!\ WARNING /!\  *************************
+The following information are given without warranty of any kind.
+
+Please refer to the the instructions provided by the target vendor.
+
+They are contributions from Buildroot users, but Buildroot developers
+do not ensure their correctness, nor maintain them.
+*************************  /!\ WARNING /!\  *************************
+
+
 This is the buildroot board support for the Avnet Spartan6 LX9 MicroBoard.
 
 The Avnet S6LX9 Microboard is a small USB-Stick sized module containing

@@ -1,3 +1,11 @@
+*************************  /!\ WARNING /!\  *************************
+The following information are given without warranty of any kind.
+
+Please refer to the the instructions provided by the target vendor.
+
+They are contributions from Buildroot users, but Buildroot developers
+do not ensure their correctness, nor maintain them.
+*************************  /!\ WARNING /!\  *************************
 
 ******************** WARNING ********************
 The compiled U-Boot binary is intended for NAND flash only!
