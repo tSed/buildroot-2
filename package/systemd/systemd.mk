@@ -30,7 +30,6 @@ SYSTEMD_CONF_OPT += \
 	--enable-static=no \
 	--disable-manpages \
 	--disable-selinux \
-	--disable-pam \
 	--disable-libcryptsetup \
 	--with-dbuspolicydir=/etc/dbus-1/system.d \
 	--with-dbussessionservicedir=/usr/share/dbus-1/services \
@@ -58,6 +57,13 @@ SYSTEMD_CONF_OPT += --enable-gudev
 SYSTEMD_DEPENDENCIES += libglib2
 else
 SYSTEMD_CONF_OPT += --disable-gudev
+endif
+
+ifeq ($(BR2_PACKAGE_LINUX_PAM),y)
+SYSTEMD_CONF_OPT += --enable-pam
+SYSTEMD_DEPENDENCIES += linux-pam
+else
+SYSTEMD_CONF_OPT += --disable-pam
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEMD_ALL_EXTRAS),y)
