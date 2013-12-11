@@ -1,0 +1,12 @@
+config BR2_PACKAGE_LIBSOUNDTOUCH
+	bool "libsoundtouch"
+	help
+	  SoundTouch is an open-source audio processing library for
+	  changing the Tempo, Pitch and Playback Rates of audio streams
+	  or audio files
+
+	  http://www.surina.net/soundtouch/index.html
+
+config BR2_PACKAGE_LIBSOUNDTOUCH_INTEGER_SAMPLES
+	bool "use integer samples instead of floats"
+	depends on BR2_PACKAGE_LIBSOUNDTOUCH
