@@ -1,0 +1,23 @@
+config BR2_PACKAGE_OPENNI2
+	bool "openni2"
+	depends on BR2_PACKAGE_HAS_UDEV
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on BR2_TOOLCHAIN_HAS_THREADS # libusb
+	select BR2_PACKAGE_LIBUSB
+	select BR2_PACKAGE_JPEG
+	help
+	  The OpenNI2 framework is an open source SDK used for the
+	  development of 3D sensing middleware libraries and
+	  applications.
+
+	  This package uses the Aldebaran's fork which build a minimal
+	  package, providing the OpenNI2 library and the driver for the
+	  Asus 3D sensor:
+	  https://github.com/aldebaran/openni2
+
+	  http://www.openni.org/
+
+comment "openni2 needs udev and a toolchain w/ C++, threads"
+	depends on !BR2_INSTALL_LIBSTDCPP || \
+		!BR2_TOOLCHAIN_HAS_THREADS || \
+		!BR2_PACKAGE_HAS_UDEV
