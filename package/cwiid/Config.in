@@ -22,4 +22,10 @@ config BR2_PACKAGE_CWIID_WMGUI
 	depends on BR2_INSTALL_LIBSTDCPP # libgtk2 -> pango
 	select BR2_PACKAGE_LIBGLIB2
 	select BR2_PACKAGE_LIBGTK2
+
+config BR2_PACKAGE_CWIID_WMINPUT_PYTHON
+	bool "python support"
+	depends on BR2_PACKAGE_PYTHON
+	help
+	  Build the cwiid python module and enable wminput python plugin support
 endif
