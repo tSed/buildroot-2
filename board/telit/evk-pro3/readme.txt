@@ -1,11 +1,9 @@
-*************************  /!\ WARNING /!\  *************************
-The following information are given without warranty of any kind.
+WARNING: the below information will overwrite the platform bootloader.
+Therefore, make sure you have a known-working recovery mechanism for
+your platform, as we cannot guarantee that the new bootloader will
+work.
+______________________________________________________________________
 
-Please refer to the the instructions provided by the target vendor.
-
-They are contributions from Buildroot users, but Buildroot developers
-do not ensure their correctness, nor maintain them.
-*************************  /!\ WARNING /!\  *************************
 
 Buildroot board support for Telit EVK-PRO3 with Telit GE863-PRO3
 

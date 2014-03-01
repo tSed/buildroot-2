@@ -1,11 +1,8 @@
-*************************  /!\ WARNING /!\  *************************
-The following information are given without warranty of any kind.
-
-Please refer to the the instructions provided by the target vendor.
-
-They are contributions from Buildroot users, but Buildroot developers
-do not ensure their correctness, nor maintain them.
-*************************  /!\ WARNING /!\  *************************
+WARNING: the below information will overwrite the platform bootloader.
+Therefore, make sure you have a known-working recovery mechanism for
+your platform, as we cannot guarantee that the new bootloader will
+work.
+______________________________________________________________________
 
 
 This is the buildroot board support for the Avnet Spartan6 LX9 MicroBoard.
