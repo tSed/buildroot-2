@@ -1,0 +1,27 @@
+From 67644fb4eb9638e941255cc37dc450b8383c83e9 Mon Sep 17 00:00:00 2001
+From: Samuel Martin <s.martin49@gmail.com>
+Date: Thu, 8 May 2014 15:10:08 +0200
+Subject: [PATCH 03/10] backports: Makefile: export KROOT and KVERSION
+ variables
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index e9256e4..2f446e6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -29,7 +29,7 @@ KERNEL_CONFIG := $(KLIB_BUILD)/.config
+ KERNEL_MAKEFILE := $(KLIB_BUILD)/Makefile
+ CONFIG_MD5 := $(shell md5sum $(KERNEL_CONFIG) 2>/dev/null | sed 's/\s.*//')
+ 
+-export KLIB KLIB_BUILD BACKPORT_PWD KMODDIR KMODPATH_ARG
++export KLIB KLIB_BUILD BACKPORT_PWD KMODDIR KMODPATH_ARG KROOT KVERSION
+ 
+ # disable built-in rules for this file
+ .SUFFIXES:
+-- 
+1.9.2
+

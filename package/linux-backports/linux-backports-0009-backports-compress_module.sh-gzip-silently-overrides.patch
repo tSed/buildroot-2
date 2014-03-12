@@ -1,0 +1,26 @@
+From 9f13e8636354f53ad9a82715f30bc7733daaf92f Mon Sep 17 00:00:00 2001
+From: Samuel Martin <s.martin49@gmail.com>
+Date: Wed, 7 May 2014 16:40:25 +0200
+Subject: [PATCH 09/10] backports: compress_module.sh: gzip silently overrides
+ existing compressed modules
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+---
+ scripts/compress_modules.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/compress_modules.sh b/scripts/compress_modules.sh
+index b2034c2..631eec9 100755
+--- a/scripts/compress_modules.sh
++++ b/scripts/compress_modules.sh
+@@ -7,6 +7,6 @@ source ./scripts/mod_helpers.sh
+ if test "$(mod_filename mac80211)" = "mac80211.ko.gz" ; then
+ 	for driver in $(find "$1" -type f -name *.ko); do
+ 		echo COMPRESS $driver
+-		gzip -9 $driver
++		gzip -f -9 $driver
+ 	done
+ fi
+-- 
+1.9.2
+

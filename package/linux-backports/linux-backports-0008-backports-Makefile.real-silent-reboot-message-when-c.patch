@@ -1,0 +1,35 @@
+From d09feb79cb46c3c7c7b211043d88b3fc951f922b Mon Sep 17 00:00:00 2001
+From: Samuel Martin <s.martin49@gmail.com>
+Date: Thu, 8 May 2014 16:20:12 +0200
+Subject: [PATCH 08/10] backports: Makefile.real: silent reboot message when
+ cross-compiling
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+---
+ Makefile.real | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.real b/Makefile.real
+index 2503016..3be1913 100644
+--- a/Makefile.real
++++ b/Makefile.real
+@@ -103,10 +103,12 @@ install: modules
+ 		"$(shell sed -n '/^CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX=y/ s//_/p' \
+ 			$(KLIB_BUILD)/.config)"
+ 	@test -n "$(CROSS_COMPILE)" || ./scripts/update-initramfs.sh $(KLIB)
+-	@echo
+-	@echo Your backported driver modules should be installed now.
+-	@echo Reboot.
+-	@echo
++	@if test ! -n "$(CROSS_COMPILE)" ; then \
++		echo ; \
++		echo Your backported driver modules should be installed now. ; \
++		echo Reboot. ; \
++		echo ; \
++	fi
+ 
+ .PHONY: modules_install
+ modules_install: install
+-- 
+1.9.2
+

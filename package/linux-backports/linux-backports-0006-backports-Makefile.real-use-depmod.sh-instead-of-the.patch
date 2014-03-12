@@ -1,0 +1,37 @@
+From 32af7610d8db0591180d803ccd714d6bd1e7593e Mon Sep 17 00:00:00 2001
+From: Samuel Martin <s.martin49@gmail.com>
+Date: Thu, 8 May 2014 16:08:52 +0200
+Subject: [PATCH 06/10] backports: Makefile.real: use depmod.sh instead of the
+ depmod program
+
+Call depmod.sh from the kernel source tree and set all parameter to
+improve cross-compilation support.
+
+This way, target root location, kernel version and symbol prefix are
+also handled.
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+---
+ Makefile.real | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.real b/Makefile.real
+index a12a0db..1dc9323 100644
+--- a/Makefile.real
++++ b/Makefile.real
+@@ -97,7 +97,11 @@ install: modules
+ 	@./scripts/blacklist.sh $(KLIB)/ $(KLIB)/$(KMODDIR) $(KROOT)
+ 	@./scripts/compress_modules.sh $(KLIB)/$(KMODDIR)
+ 	@./scripts/check_depmod.sh $(DEPMOD) $(KROOT)
+-	@$(DEPMOD) -a
++	@$(KMODPATH_ARGS) $(KLIB_BUILD)/scripts/depmod.sh \
++		$(DEPMOD) \
++		$(KVERSION) \
++		"$(shell sed -n '/^CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX=y/ s//_/p' \
++			$(KLIB_BUILD)/.config)"
+ 	@./scripts/update-initramfs.sh $(KLIB)
+ 	@echo
+ 	@echo Your backported driver modules should be installed now.
+-- 
+1.9.2
+

@@ -1,0 +1,46 @@
+From fbab3acdb2043fb24fb557e536e15aa7c2db0a15 Mon Sep 17 00:00:00 2001
+From: Samuel Martin <s.martin49@gmail.com>
+Date: Thu, 8 May 2014 15:45:11 +0200
+Subject: [PATCH 04/10] backports: blacklist.sh: support install root not in /
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+---
+ Makefile.real        | 2 +-
+ scripts/blacklist.sh | 7 ++++---
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.real b/Makefile.real
+index f60d5ca..5a25db4 100644
+--- a/Makefile.real
++++ b/Makefile.real
+@@ -92,7 +92,7 @@ install: modules
+ 	@$(MAKE) -C $(KLIB_BUILD) M=$(BACKPORT_PWD)			\
+ 		INSTALL_MOD_DIR=$(KMODDIR) $(KMODPATH_ARG)		\
+ 		modules_install
+-	@./scripts/blacklist.sh $(KLIB)/ $(KLIB)/$(KMODDIR)
++	@./scripts/blacklist.sh $(KLIB)/ $(KLIB)/$(KMODDIR) $(KROOT)
+ 	@./scripts/compress_modules.sh $(KLIB)/$(KMODDIR)
+ 	@./scripts/check_depmod.sh
+ 	@/sbin/depmod -a
+diff --git a/scripts/blacklist.sh b/scripts/blacklist.sh
+index f941c4a..f995f11 100755
+--- a/scripts/blacklist.sh
++++ b/scripts/blacklist.sh
+@@ -1,10 +1,11 @@
+ #!/bin/bash
+ 
+-BLACKLIST_CONF="/etc/modprobe.d/backports.conf"
+-BLACKLIST_MAP=".blacklist.map"
+-
+ MODULE_DIR=$1
+ MODULE_UPDATES=$2
++KROOT=$3
++
++BLACKLIST_CONF="$KROOT/etc/modprobe.d/backports.conf"
++BLACKLIST_MAP=".blacklist.map"
+ 
+ if [[ ! -d $MODULE_DIR ]]; then
+ 	exit
+-- 
+1.9.2
+

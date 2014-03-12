@@ -1,0 +1,35 @@
+From 83b3f7e3a9b2a2b3057b32fd41bed4b4503e86d3 Mon Sep 17 00:00:00 2001
+From: Samuel Martin <s.martin49@gmail.com>
+Date: Thu, 8 May 2014 15:06:15 +0200
+Subject: [PATCH 01/10] backports: Makefile: introduce KROOT and fix
+ INSTALL_MOD_PATH definition
+
+INSTALL_MOD_PATH should point to the root directory of the target
+rootfs, what is KROOT.
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+---
+ Makefile | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index ea3982b..3ff74d9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -9,10 +9,11 @@ SHELL := /bin/bash
+ BACKPORT_PWD := $(shell pwd)
+ 
+ KMODDIR ?= updates
+-ifneq ($(origin KLIB), undefined)
+-KMODPATH_ARG := "INSTALL_MOD_PATH=$(KLIB)"
++ifneq ($(origin KROOT), undefined)
++KMODPATH_ARG := "INSTALL_MOD_PATH=$(KROOT)"
+ else
+ KLIB := /lib/modules/$(shell uname -r)/
++KROOT := /
+ KMODPATH_ARG :=
+ endif
+ KLIB_BUILD ?= $(KLIB)/build/
+-- 
+1.9.2
+

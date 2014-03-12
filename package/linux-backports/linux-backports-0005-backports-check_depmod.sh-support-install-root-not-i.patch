@@ -1,0 +1,61 @@
+From 44c7269249a5cbf4b0b96d99ec63aac04f05cebf Mon Sep 17 00:00:00 2001
+From: Samuel Martin <s.martin49@gmail.com>
+Date: Thu, 8 May 2014 15:55:31 +0200
+Subject: [PATCH 05/10] backports: check_depmod.sh: support install root not in
+ /
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+---
+ Makefile.real           | 6 ++++--
+ scripts/check_depmod.sh | 7 ++++---
+ 2 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.real b/Makefile.real
+index 5a25db4..a12a0db 100644
+--- a/Makefile.real
++++ b/Makefile.real
+@@ -6,6 +6,8 @@ else
+ export BACKPORTS_GIT_TRACKER_DEF=
+ endif
+ 
++DEPMOD ?= /sbin/depmod
++
+ # disable built-in rules for this file
+ .SUFFIXES:
+ 
+@@ -94,8 +96,8 @@ install: modules
+ 		modules_install
+ 	@./scripts/blacklist.sh $(KLIB)/ $(KLIB)/$(KMODDIR) $(KROOT)
+ 	@./scripts/compress_modules.sh $(KLIB)/$(KMODDIR)
+-	@./scripts/check_depmod.sh
+-	@/sbin/depmod -a
++	@./scripts/check_depmod.sh $(DEPMOD) $(KROOT)
++	@$(DEPMOD) -a
+ 	@./scripts/update-initramfs.sh $(KLIB)
+ 	@echo
+ 	@echo Your backported driver modules should be installed now.
+diff --git a/scripts/check_depmod.sh b/scripts/check_depmod.sh
+index 6123894..9f2e238 100755
+--- a/scripts/check_depmod.sh
++++ b/scripts/check_depmod.sh
+@@ -6,13 +6,14 @@
+ 
+ # Seems Mandriva has an $DEPMOD_DIR but it doesn't have any files,
+ # so lets deal with those distributions.
+-DEPMOD_CONF="/etc/depmod.conf"
++DEPMOD_CMD="${1:-depmod}"
++KROOT="${2:-/}"
++DEPMOD_CONF="$KROOT/etc/depmod.conf"
+ DEPMOD_CONF_TMP="$DEPMOD_CONF.backports.old"
+-DEPMOD_DIR="/etc/depmod.d/"
++DEPMOD_DIR="$KROOT/etc/depmod.d/"
+ BACKPORT_DEPMOD_FILE="backports.conf"
+ GREP_REGEX_UPDATES="^[[:space:]]*search.*[[:space:]]updates\([[:space:]]\|$\)"
+ GREP_REGEX_SEARCH="^[[:space:]]*search[[:space:]].\+$"
+-DEPMOD_CMD="depmod"
+ 
+ function add_compat_depmod_conf {
+ 	echo "NOTE: Your distribution lacks an $DEPMOD_DIR directory with "
+-- 
+1.9.2
+

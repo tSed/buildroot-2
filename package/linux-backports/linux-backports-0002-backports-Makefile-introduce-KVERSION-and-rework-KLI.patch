@@ -1,0 +1,38 @@
+From 0f44ff07f1a3cfd80638695d6f625f39ec8b22ef Mon Sep 17 00:00:00 2001
+From: Samuel Martin <s.martin49@gmail.com>
+Date: Thu, 8 May 2014 15:09:34 +0200
+Subject: [PATCH 02/10] backports: Makefile: introduce KVERSION and rework KLIB
+ definition
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+---
+ Makefile | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 3ff74d9..e9256e4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -12,10 +12,18 @@ KMODDIR ?= updates
+ ifneq ($(origin KROOT), undefined)
+ KMODPATH_ARG := "INSTALL_MOD_PATH=$(KROOT)"
+ else
+-KLIB := /lib/modules/$(shell uname -r)/
+ KROOT := /
+ KMODPATH_ARG :=
+ endif
++
++ifneq ($(origin KLIB_BUILD), undefined)
++KVERSION := $(shell $(MAKE) -C $(KLIB_BUILD) $(if $(ARCH),ARCH=$(ARCH)) \
++	--no-print-directory -s kernelrelease)
++else
++KVERSION := $(shell uname -r)
++endif
++
++KLIB := $(KROOT)/lib/modules/$(KVERSION)
+ KLIB_BUILD ?= $(KLIB)/build/
+ KERNEL_CONFIG := $(KLIB_BUILD)/.config
+ KERNEL_MAKEFILE := $(KLIB_BUILD)/Makefile
+-- 
+1.9.2
+

@@ -1,0 +1,40 @@
+config BR2_PACKAGE_LINUX_BACKPORTS
+	bool "linux-backports"
+	depends on BR2_LINUX_KERNEL
+	help
+	  Compatibility driver backports (former compat-wireless).
+
+	  http://wireless.kernel.org/
+
+#
+# Configuration selection
+#
+if BR2_PACKAGE_LINUX_BACKPORTS
+
+choice
+	prompt "Backport configuration"
+	default BR2_PACKAGE_LINUX_BACKPORTS_USE_DEFCONFIG
+
+config BR2_PACKAGE_LINUX_BACKPORTS_USE_DEFCONFIG
+	bool "Using a defconfig"
+
+config BR2_PACKAGE_LINUX_BACKPORTS_USE_CUSTOM_CONFIG
+	bool "Using a custom config file"
+
+endchoice
+
+config BR2_PACKAGE_LINUX_BACKPORTS_DEFCONFIG
+	string "Defconfig name"
+	depends on BR2_PACKAGE_LINUX_BACKPORTS_USE_DEFCONFIG
+	help
+	  Name of the backports defconfig file to use, without the
+	  leading 'defconfig-'.  The defconfig is located in
+	  defconfigs/ in the linux-backports tree.
+
+config BR2_PACKAGE_LINUX_BACKPORTS_CUSTOM_CONFIG_FILE
+	string "Configuration file path"
+	depends on BR2_PACKAGE_LINUX_BACKPORTS_USE_CUSTOM_CONFIG
+	help
+	  Path to the linux-backports configuration file
+
+endif

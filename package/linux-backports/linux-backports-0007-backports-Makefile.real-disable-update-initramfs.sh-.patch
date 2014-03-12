@@ -1,0 +1,27 @@
+From f374a3e33fac77a0d639314653194c5cf5c5c94c Mon Sep 17 00:00:00 2001
+From: Samuel Martin <s.martin49@gmail.com>
+Date: Thu, 8 May 2014 16:19:31 +0200
+Subject: [PATCH 07/10] backports: Makefile.real: disable update-initramfs.sh
+ execution when cross-compiling
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+---
+ Makefile.real | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.real b/Makefile.real
+index 1dc9323..2503016 100644
+--- a/Makefile.real
++++ b/Makefile.real
+@@ -102,7 +102,7 @@ install: modules
+ 		$(KVERSION) \
+ 		"$(shell sed -n '/^CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX=y/ s//_/p' \
+ 			$(KLIB_BUILD)/.config)"
+-	@./scripts/update-initramfs.sh $(KLIB)
++	@test -n "$(CROSS_COMPILE)" || ./scripts/update-initramfs.sh $(KLIB)
+ 	@echo
+ 	@echo Your backported driver modules should be installed now.
+ 	@echo Reboot.
+-- 
+1.9.2
+
