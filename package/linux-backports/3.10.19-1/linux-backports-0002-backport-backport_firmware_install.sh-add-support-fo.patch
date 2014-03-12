@@ -1,0 +1,61 @@
+From 430f74d25d99639b59e3cc223942fea200bf0d0e Mon Sep 17 00:00:00 2001
+From: Samuel Martin <smartin@aldebaran-robotics.com>
+Date: Wed, 12 Mar 2014 20:49:03 +0100
+Subject: [PATCH 2/4] backport: backport_firmware_install.sh: add support for
+ installation not in /
+
+Signed-off-by: Samuel Martin <smartin@aldebaran-robotics.com>
+---
+ backport/Makefile.real                        |  2 +-
+ backport/scripts/backport_firmware_install.sh | 14 ++++++++------
+ 2 files changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/Makefile.real b/Makefile.real
+index 2bcf200..466aa7c 100644
+--- a/Makefile.real
++++ b/Makefile.real
+@@ -90,7 +90,7 @@ install: modules
+ 	@./scripts/blacklist.sh $(KLIB)/ $(KLIB)/$(KMODDIR)
+ 	@./scripts/compress_modules.sh $(KLIB)/$(KMODDIR)
+ 	@./scripts/check_depmod.sh $(KLIB)
+-	@./scripts/backport_firmware_install.sh
++	@./scripts/backport_firmware_install.sh "${KLIB}"
+ 	@/sbin/depmod -a
+ 	@./scripts/update-initramfs.sh $(KLIB)
+ 	@echo
+diff --git a/scripts/backport_firmware_install.sh b/scripts/backport_firmware_install.sh
+index 5a82947..3650055 100755
+--- a/scripts/backport_firmware_install.sh
++++ b/scripts/backport_firmware_install.sh
+@@ -1,5 +1,7 @@
+ #!/bin/sh
+
++KLIB="${1}"
++
+ if [ -f /usr/bin/lsb_release ]; then
+ 	LSB_RED_ID=$(/usr/bin/lsb_release -i -s)
+ else
+@@ -8,14 +10,14 @@ fi
+
+ case $LSB_RED_ID in
+ "Ubuntu")
+-	mkdir -p /lib/udev/ /lib/udev/rules.d/
+-	cp udev/ubuntu/compat_firmware.sh /lib/udev/
+-	cp udev/50-compat_firmware.rules /lib/udev/rules.d/
++	mkdir -p "${KLIB}/lib/udev" "${KLIB}/etc/udev/rules.d"
++	cp udev/ubuntu/compat_firmware.sh "${KLIB}/lib/udev"
++	cp udev/50-compat_firmware.rules "${KLIB}/etc/udev/rules.d"
+         ;;
+ *)
+-	mkdir -p /lib/udev/ /lib/udev/rules.d/
+-	cp udev/compat_firmware.sh /lib/udev/
+-	cp udev/50-compat_firmware.rules /lib/udev/rules.d/
++	mkdir -p "${KLIB}/lib/udev" "${KLIB}/lib/udev/rules.d"
++	cp udev/compat_firmware.sh "${KLIB}/lib/udev"
++	cp udev/50-compat_firmware.rules "${KLIB}/lib/udev/rules.d"
+         ;;
+ esac
+
+--
+1.9.0
+

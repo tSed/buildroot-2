@@ -42,4 +42,6 @@ config BR2_LINUX_KERNEL_EXT_RTAI_PATCH
 	help
 	  Optionally, explicitly specify the RTAI patch to use.
 
+source "package/linux-backports/Config.in"
+
 endmenu

@@ -1,0 +1,42 @@
+From ee494e98e7b01b39e2646c29aec6288954c41d29 Mon Sep 17 00:00:00 2001
+From: Samuel Martin <smartin@aldebaran-robotics.com>
+Date: Wed, 12 Mar 2014 20:50:33 +0100
+Subject: [PATCH 3/4] backport: Makefile: support depmod for cross-compilation
+
+Also allow to override the default depmod program.
+
+Signed-off-by: Samuel Martin <smartin@aldebaran-robotics.com>
+---
+ backport/Makefile      | 1 +
+ backport/Makefile.real | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index ea3982b..1b58b71 100644
+--- a/Makefile
++++ b/Makefile
+@@ -19,6 +19,7 @@ KLIB_BUILD ?= $(KLIB)/build/
+ KERNEL_CONFIG := $(KLIB_BUILD)/.config
+ KERNEL_MAKEFILE := $(KLIB_BUILD)/Makefile
+ CONFIG_MD5 := $(shell md5sum $(KERNEL_CONFIG) 2>/dev/null | sed 's/\s.*//')
++DEPMOD ?= /sbin/depmod
+ 
+ export KLIB KLIB_BUILD BACKPORT_PWD KMODDIR KMODPATH_ARG
+ 
+diff --git a/Makefile.real b/Makefile.real
+index 466aa7c..2de8eff 100644
+--- a/Makefile.real
++++ b/Makefile.real
+@@ -91,7 +91,8 @@ install: modules
+ 	@./scripts/compress_modules.sh $(KLIB)/$(KMODDIR)
+ 	@./scripts/check_depmod.sh $(KLIB)
+ 	@./scripts/backport_firmware_install.sh "${KLIB}"
+-	@/sbin/depmod -a
++	@$(KMODPATH_ARGS) $(KLIB_BUILD)/scripts/depmod.sh $(DEPMOD) \
++		$(shell $(MAKE) $(KMODPATH_ARGS) -C $(KLIB_BUILD) --no-print-directory -s kernelrelease)
+ 	@./scripts/update-initramfs.sh $(KLIB)
+ 	@echo
+ 	@echo Your backported driver modules should be installed now.
+-- 
+1.9.0
+

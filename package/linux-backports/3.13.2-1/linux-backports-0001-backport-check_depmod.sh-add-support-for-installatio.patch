@@ -1,0 +1,46 @@
+From f330aa8a2c6a02a64aeef12ce182db553e480c1d Mon Sep 17 00:00:00 2001
+From: Samuel Martin <smartin@aldebaran-robotics.com>
+Date: Wed, 12 Mar 2014 20:48:00 +0100
+Subject: [PATCH 1/4] backport: check_depmod.sh: add support for installation
+ no in /
+
+Signed-off-by: Samuel Martin <smartin@aldebaran-robotics.com>
+---
+ backport/Makefile.real           | 2 +-
+ backport/scripts/check_depmod.sh | 6 ++++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.real b/Makefile.real
+index c09663c..2bcf200 100644
+--- a/Makefile.real
++++ b/Makefile.real
+@@ -89,7 +89,7 @@ install: modules
+ 		modules_install
+ 	@./scripts/blacklist.sh $(KLIB)/ $(KLIB)/$(KMODDIR)
+ 	@./scripts/compress_modules.sh $(KLIB)/$(KMODDIR)
+-	@./scripts/check_depmod.sh
++	@./scripts/check_depmod.sh $(KLIB)
+ 	@./scripts/backport_firmware_install.sh
+ 	@/sbin/depmod -a
+ 	@./scripts/update-initramfs.sh $(KLIB)
+diff --git a/scripts/check_depmod.sh b/scripts/check_depmod.sh
+index 6123894..90d1321 100755
+--- a/scripts/check_depmod.sh
++++ b/scripts/check_depmod.sh
+@@ -6,9 +6,11 @@
+ 
+ # Seems Mandriva has an $DEPMOD_DIR but it doesn't have any files,
+ # so lets deal with those distributions.
+-DEPMOD_CONF="/etc/depmod.conf"
++
++KLIB="${1}"
++DEPMOD_CONF="${KLIB}/etc/depmod.conf"
+ DEPMOD_CONF_TMP="$DEPMOD_CONF.backports.old"
+-DEPMOD_DIR="/etc/depmod.d/"
++DEPMOD_DIR="${KLIB}/etc/depmod.d/"
+ BACKPORT_DEPMOD_FILE="backports.conf"
+ GREP_REGEX_UPDATES="^[[:space:]]*search.*[[:space:]]updates\([[:space:]]\|$\)"
+ GREP_REGEX_SEARCH="^[[:space:]]*search[[:space:]].\+$"
+-- 
+1.9.0
+

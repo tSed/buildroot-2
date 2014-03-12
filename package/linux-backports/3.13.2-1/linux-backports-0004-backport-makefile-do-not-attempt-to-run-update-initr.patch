@@ -1,0 +1,27 @@
+From bec90fbe5242f82c4362a8bf0ebbe9c4c756e36d Mon Sep 17 00:00:00 2001
+From: Samuel Martin <smartin@aldebaran-robotics.com>
+Date: Wed, 12 Mar 2014 20:51:24 +0100
+Subject: [PATCH 4/4] backport: makefile: do not attempt to run
+ update-initramfs.sh when cross-compiling
+
+Signed-off-by: Samuel Martin <smartin@aldebaran-robotics.com>
+---
+ backport/Makefile.real | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.real b/Makefile.real
+index 2de8eff..877a993 100644
+--- a/Makefile.real
++++ b/Makefile.real
+@@ -93,7 +93,7 @@ install: modules
+ 	@./scripts/backport_firmware_install.sh "${KLIB}"
+ 	@$(KMODPATH_ARGS) $(KLIB_BUILD)/scripts/depmod.sh $(DEPMOD) \
+ 		$(shell $(MAKE) $(KMODPATH_ARGS) -C $(KLIB_BUILD) --no-print-directory -s kernelrelease)
+-	@./scripts/update-initramfs.sh $(KLIB)
++	@test -n "$(CROSS_COMPILE)" || ./scripts/update-initramfs.sh $(KLIB)
+ 	@echo
+ 	@echo Your backported driver modules should be installed now.
+ 	@echo Reboot.
+-- 
+1.9.0
+
