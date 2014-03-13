@@ -1,0 +1,209 @@
+From 52a285d0279d9704d7506bc65c76e858ddbb93ab Mon Sep 17 00:00:00 2001
+From: Samuel Martin <s.martin49@gmail.com>
+Date: Tue, 18 Mar 2014 21:51:20 +0100
+Subject: [PATCH 3/3] cmake: offer CMake modules with no hard-coded path
+
+Hardcoding absolute install paths in the CMake module files totally
+breaks the cross-compilation: it makes impossible to be used in a
+sysroot because the hardcoded paths are the ones of the target, whereas
+they should point to the sysroot location. This tootally breaks the
+CMake FIND_ROOT_PATH mechanism designed to handle cross-compilation.
+
+This patch introduces a new CMake variable: NO_ABSOLUTE_PATH_IN_MODULE,
+which, when set on the cmake command-line, will enable the installation
+of the CMake module files using the CMake primitives find_library and
+find_path to set the libraries and headers' locations, instead of
+hard-coding them.
+
+Thus, this patch adds non-templated CMake module files for octomap,
+dynamicEDT3D and octovis for the non hard-coded path version of the
+modules.
+
+In any way, only the installed CMake module files are changed. The
+templated ones are still needed for combined package build.
+
+The non hard-coded path version of the modules are only installed when
+NO_ABSOLUTE_PATH_IN_MODULE is set; by default the existing behavior
+remains unchanged to keep honoring the behavior described in [1].
+
+[1] https://github.com/OctoMap/octomap/pull/57#issuecomment-38161187
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+---
+ dynamicEDT3D/CMakeLists.txt            |  9 ++++++--
+ dynamicEDT3D/dynamicEDT3D-config.cmake | 19 ++++++++++++++++
+ octomap/CMakeLists.txt                 |  7 +++++-
+ octomap/octomap-config.cmake           | 41 ++++++++++++++++++++++++++++++++++
+ octovis/CMakeLists.txt                 |  7 +++++-
+ octovis/octovis-config.cmake           | 24 ++++++++++++++++++++
+ 6 files changed, 103 insertions(+), 4 deletions(-)
+ create mode 100644 dynamicEDT3D/dynamicEDT3D-config.cmake
+ create mode 100644 octomap/octomap-config.cmake
+ create mode 100644 octovis/octovis-config.cmake
+
+diff --git a/dynamicEDT3D/CMakeLists.txt b/dynamicEDT3D/CMakeLists.txt
+index f9e77cf..2f5ca21 100644
+--- a/dynamicEDT3D/CMakeLists.txt
++++ b/dynamicEDT3D/CMakeLists.txt
+@@ -91,9 +91,14 @@ configure_file(dynamicEDT3D-config.cmake.in
+   "${PROJECT_BINARY_DIR}/InstallFiles/dynamicEDT3D-config.cmake" @ONLY)
+ configure_file(dynamicEDT3D-config-version.cmake.in
+   "${PROJECT_BINARY_DIR}/InstallFiles/dynamicEDT3D-config-version.cmake" @ONLY)
++IF(DEFINED NO_ABSOLUTE_PATH_IN_MODULE AND NO_ABSOLUTE_PATH_IN_MODULE)
++  set(DYNAMICEDT3D_MODULE_FILE "dynamicEDT3D-config.cmake")
++ELSE()
++  set(DYNAMICEDT3D_MODULE_FILE "${PROJECT_BINARY_DIR}/InstallFiles/dynamicEDT3D-config.cmake" )
++ENDIF()
+ install(FILES
+-  "${PROJECT_BINARY_DIR}/InstallFiles/dynamicEDT3DConfig.cmake"
+-  "${PROJECT_BINARY_DIR}/InstallFiles/dynamicEDT3DConfig-version.cmake"
++  "${PROJECT_BINARY_DIR}/InstallFiles/dynamicEDT3D-config-version.cmake"
++  "${DYNAMICEDT3D_MODULE_FILE}"
+   DESTINATION share/dynamicEDT3D/)
+ 
+ # Write pkgconfig-file:
+diff --git a/dynamicEDT3D/dynamicEDT3D-config.cmake b/dynamicEDT3D/dynamicEDT3D-config.cmake
+new file mode 100644
+index 0000000..c21a9ae
+--- /dev/null
++++ b/dynamicEDT3D/dynamicEDT3D-config.cmake
+@@ -0,0 +1,19 @@
++# - Config file for the OctoMap package
++# (example from http://www.vtk.org/Wiki/CMake/Tutorials/How_to_create_a_ProjectConfig.cmake_file)
++# It defines the following variables
++#  OCTOMAP_INCLUDE_DIRS - include directories for OctoMap
++#  OCTOMAP_LIBRARIES    - libraries to link against
++
++set(DYNAMICEDT3D_INCLUDE_DIRS)
++set(DYNAMICEDT3D_INCLUDE DYNAMICEDT3D_INCLUDE-NOTFOUND)
++find_path(DYNAMICEDT3D_INCLUDE dynamicEDT3D/dynamicEDT3D.h)
++if(DYNAMICEDT3D_INCLUDE)
++  list(APPEND DYNAMICEDT3D_INCLUDE_DIRS ${DYNAMICEDT3D_INCLUDE})
++endif()
++
++set(DYNAMICEDT3D_LIBRARIES)
++set(DYNAMICEDT3D_LIB DYNAMICEDT3D_LIB-NOTFOUND)
++find_library(DYNAMICEDT3D_LIB dynamicedt3d)
++if(DYNAMICEDT3D_LIB)
++  list(APPEND DYNAMICEDT3D_LIBRARIES ${DYNAMICEDT3D_LIB})
++endif()
+diff --git a/octomap/CMakeLists.txt b/octomap/CMakeLists.txt
+index 9c9f674..71099a3 100644
+--- a/octomap/CMakeLists.txt
++++ b/octomap/CMakeLists.txt
+@@ -98,9 +98,14 @@ configure_file(octomap-config.cmake.in
+   "${PROJECT_BINARY_DIR}/InstallFiles/octomap-config.cmake" @ONLY)
+ configure_file(octomap-config-version.cmake.in
+   "${PROJECT_BINARY_DIR}/InstallFiles/octomap-config-version.cmake" @ONLY)
++IF(DEFINED NO_ABSOLUTE_PATH_IN_MODULE AND NO_ABSOLUTE_PATH_IN_MODULE)
++  set(OCTOMAP_MODULE_FILE "octomap-config.cmake")
++ELSE()
++  set(OCTOMAP_MODULE_FILE "${PROJECT_BINARY_DIR}/InstallFiles/octomap-config.cmake" )
++ENDIF()
+ install(FILES
+-  "${PROJECT_BINARY_DIR}/InstallFiles/octomap-config.cmake"
+   "${PROJECT_BINARY_DIR}/InstallFiles/octomap-config-version.cmake" 
++  "${OCTOMAP_MODULE_FILE}"
+   DESTINATION share/octomap/)
+ 
+ # Write pkgconfig-file:
+diff --git a/octomap/octomap-config.cmake b/octomap/octomap-config.cmake
+new file mode 100644
+index 0000000..5572b89
+--- /dev/null
++++ b/octomap/octomap-config.cmake
+@@ -0,0 +1,41 @@
++# ===================================================================================
++#  The OctoMap CMake configuration file
++#
++#             ** File generated automatically, do not modify **
++#
++#  Usage from an external project:
++#    In your CMakeLists.txt, add these lines:
++#
++#    FIND_PACKAGE(octomap REQUIRED )
++#    TARGET_LINK_LIBRARIES(MY_TARGET_NAME ${OCTOMAP_LIBRARIES})
++#
++#    This file will define the following variables:
++#      - OCTOMAP_LIBRARIES      : The list of libraries to links against.
++#      - OCTOMAP_LIBRARY_DIRS   : The directory where lib files are. Calling
++#                                 LINK_DIRECTORIES with this path is NOT needed.
++#      - OCTOMAP_INCLUDE_DIRS   : The OpenCV include directories.
++#
++# Based on the example CMake Tutorial
++# http://www.vtk.org/Wiki/CMake/Tutorials/How_to_create_a_ProjectConfig.cmake_file
++# and OpenCVConfig.cmake.in from OpenCV
++# ===================================================================================
++
++set(OCTOMAP_INCLUDE_DIRS)
++set(OCTOMAP_INCLUDE OCTOMAP_INCLUDE-NOTFOUND)
++find_path(OCTOMAP_INCLUDE octomap/octomap.h)
++if(OCTOMAP_INCLUDE)
++  list(APPEND OCTOMAP_INCLUDE_DIRS ${OCTOMAP_INCLUDE})
++endif()
++
++set(OCTOMAP_LIBRARIES)
++set(OCTOMAP_LIB OCTOMAP_LIB-NOTFOUND)
++find_library(OCTOMAP_LIB octomap)
++if(OCTOMAP_LIB)
++  list(APPEND OCTOMAP_LIBRARIES ${OCTOMAP_LIB})
++endif()
++
++set(OCTOMATH_LIB OCTOMATH_LIB-NOTFOUND)
++find_library(OCTOMATH_LIB octomath)
++if(OCTOMATH_LIB)
++  list(APPEND OCTOMAP_LIBRARIES ${OCTOMATH_LIB})
++endif()
+diff --git a/octovis/CMakeLists.txt b/octovis/CMakeLists.txt
+index edfca27..c62b6bc 100644
+--- a/octovis/CMakeLists.txt
++++ b/octovis/CMakeLists.txt
+@@ -95,9 +95,14 @@ IF(BUILD_VIEWER)
+     "${PROJECT_BINARY_DIR}/InstallFiles/octovis-config.cmake" @ONLY)
+   configure_file(octovis-config-version.cmake.in
+     "${PROJECT_BINARY_DIR}/InstallFiles/octovis-config-version.cmake" @ONLY)
++  IF(DEFINED NO_ABSOLUTE_PATH_IN_MODULE AND NO_ABSOLUTE_PATH_IN_MODULE)
++    set(OCTOVIS_MODULE_FILE "octovis-config.cmake")
++  ELSE()
++    set(OCTOVIS_MODULE_FILE "${PROJECT_BINARY_DIR}/InstallFiles/octovis-config.cmake" )
++  ENDIF()
+   install(FILES
+-    "${PROJECT_BINARY_DIR}/InstallFiles/octovis-config.cmake"
+     "${PROJECT_BINARY_DIR}/InstallFiles/octovis-config-version.cmake" 
++    "${OCTOVIS_MODULE_FILE}"
+     DESTINATION share/octovis/)
+     
+     
+diff --git a/octovis/octovis-config.cmake b/octovis/octovis-config.cmake
+new file mode 100644
+index 0000000..99d9798
+--- /dev/null
++++ b/octovis/octovis-config.cmake
+@@ -0,0 +1,24 @@
++# - Config file for the OctoMap package
++# (example from http://www.vtk.org/Wiki/CMake/Tutorials/How_to_create_a_ProjectConfig.cmake_file)
++# It defines the following variables
++#  OCTOVIS_INCLUDE_DIRS - include directories for OctoMap viewer
++#  OCTOVIS_LIBRARIES    - libraries to link against
++
++find_package(OCTOMAP)
++
++set(QGLViewer_LIB QGLViewer_LIB-NOTFOUND)
++find_library(QGLViewer_LIB QGLViewer)
++if(NOT QGLViewer_LIB)
++  message(FATAL "Could not find QGLViewer")
++endif()
++
++find_package(Qt4 COMPONENTS QTCORE QTGUI QTOPENGL)
++
++set(OCTOVIS_INCLUDE_DIRS)
++set(OCTOVIS_LIBRARIES)
++
++list(APPEND OCTOVIS_INCLUDE_DIRS ${OCTOMAP_INCLUDE}
++  ${QT_QTCORE_INCLUDE_DIR} ${QT_QTGUI_INCLUDE_DIR} ${QT_QTOPENGL_INCLUDE_DIR})
++
++list(APPEND OCTOVIS_LIBRARIES ${OCTOMAP_LIB} ${QGLViewer_LIB}
++  ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTOPENGL_LIBRARY})
+-- 
+1.9.2
+
