@@ -1,0 +1,19 @@
+config BR2_PACKAGE_OCTOMAP
+	bool "octomap"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	  The OctoMap library implements a 3D occupancy grid mapping
+	  approach, providing data structures and mapping algorithms in
+	  C++ particularly suited for robotics.
+
+	  http://octomap.github.io/
+
+if BR2_PACKAGE_OCTOMAP
+
+config BR2_PACKAGE_OCTOMAP_INSTALL_PROGRAMS
+	bool "Install octomap programs in the target"
+
+endif
+
+comment "octomap needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP
