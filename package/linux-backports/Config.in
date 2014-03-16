@@ -19,6 +19,16 @@ if BR2_PACKAGE_LINUX_BACKPORTS
 choice
 	prompt "Backports version"
 
+config BR2_PACKAGE_LINUX_BACKPORTS_3_7_9
+	bool "3.7.9"
+	depends on BROKEN
+	select BR2_PACKAGE_LINUX_BACKPORTS_DONT_USE_DOT_CONFIG
+
+config BR2_PACKAGE_LINUX_BACKPORTS_3_8_3
+	bool "3.8.3"
+	depends on BROKEN
+	select BR2_PACKAGE_LINUX_BACKPORTS_DONT_USE_DOT_CONFIG
+
 config BR2_PACKAGE_LINUX_BACKPORTS_3_10_19
 	bool "3.10.19"
 
@@ -74,6 +84,8 @@ endif
 
 config BR2_PACKAGE_LINUX_BACKPORTS_VERSION
 	string
+	default "3.7.9-1"   if BR2_PACKAGE_LINUX_BACKPORTS_3_7_9
+	default "3.8.3-2"   if BR2_PACKAGE_LINUX_BACKPORTS_3_8_3
 	default "3.10.19-1" if BR2_PACKAGE_LINUX_BACKPORTS_3_10_19
 	default "3.11.8-1"  if BR2_PACKAGE_LINUX_BACKPORTS_3_11_8
 	default "3.12.8-1"  if BR2_PACKAGE_LINUX_BACKPORTS_3_12_8
@@ -106,6 +118,38 @@ config BR2_PACKAGE_LINUX_BACKPORTS_PATCH
 # command, the config is done (hardcoded) via a config.mk file
 #
 
+config BR2_PACKAGE_LINUX_BACKPORTS_DONT_USE_DOT_CONFIG
+	bool "use config.mk for configuration"
+	depends on BROKEN
+	depends on BR2_PACKAGE_LINUX_BACKPORTS_3_7_9 || \
+		BR2_PACKAGE_LINUX_BACKPORTS_3_8_3 || \
+		BR2_PACKAGE_LINUX_BACKPORTS_CUSTOM_VERSION || \
+		BR2_PACKAGE_LINUX_BACKPORTS_CUSTOM_TARBALL || \
+		BR2_PACKAGE_LINUX_BACKPORTS_CUSTOM_GIT
+	help
+	  Prior to version 3.10, linux-backports (named compat-wireless,
+	  then compat-drivers) use a config.mk file for the driver
+	  selection, instead of a defconfig or .config file.
+
+	  For backports prior to version 3.10, the configuration is usually
+	  done by running the select_driver script (from the sources) or by
+	  hacking the makefile.
+
+	  Since there is no easy and generic way to configure these
+	  linux-backports versions, it is sugested to provided your own
+	  patch set to define the configuration meeting your requirements.
+
+config BR2_PACKAGE_LINUX_BACKPORTS_CUSTOM_CONFIG_MK_FILE
+	string "Configuration (config.mk) file path"
+	depends on BR2_PACKAGE_LINUX_BACKPORTS_DONT_USE_DOT_CONFIG
+	help
+	  Path to the linux-backports config.mk configuration file.
+
+	  Leave empty if the configuration is already set in the source tree
+	  (via patches or custom sources).
+
+if !BR2_PACKAGE_LINUX_BACKPORTS_DONT_USE_DOT_CONFIG
+
 choice
 	prompt "Backport configuration"
 	default BR2_PACKAGE_LINUX_BACKPORTS_USE_DEFCONFIG
@@ -132,4 +176,5 @@ config BR2_PACKAGE_LINUX_BACKPORTS_CUSTOM_CONFIG_FILE
 	help
 	  Path to the linux-backports configuration file
 
+endif
 endif
