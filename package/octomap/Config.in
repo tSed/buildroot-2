@@ -1,3 +1,6 @@
+config BR2_PACKAGE_DYNAMICEDT3D
+	bool
+
 config BR2_PACKAGE_OCTOMAP
 	bool "octomap"
 	depends on BR2_INSTALL_LIBSTDCPP
@@ -12,6 +15,10 @@ if BR2_PACKAGE_OCTOMAP
 
 config BR2_PACKAGE_OCTOMAP_INSTALL_PROGRAMS
 	bool "Install octomap programs in the target"
+
+config BR2_PACKAGE_OCTOMAP_DYNAMICEDT3D
+	bool "dynamic Euclidean distance (dynamicEDT3D)"
+	select BR2_PACKAGE_DYNAMICEDT3D
 
 endif
 
