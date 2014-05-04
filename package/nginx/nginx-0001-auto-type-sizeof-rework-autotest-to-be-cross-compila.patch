@@ -1,0 +1,99 @@
+From 7c963ab3a6d47b55fe1e0d9efb169962ab6afe32 Mon Sep 17 00:00:00 2001
+From: Samuel Martin <s.martin49@gmail.com>
+Date: Thu, 24 Apr 2014 23:27:32 +0200
+Subject: [PATCH 1/3] auto/type/sizeof: rework autotest to be cross-compilation
+ friendly
+
+Rework the sizeof test to do the checks at compile time instead of at
+runtime. This way, it does not break when cross-compiling for a
+different CPU architecture.
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+---
+ auto/types/sizeof | 59 ++++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 43 insertions(+), 16 deletions(-)
+
+diff --git a/auto/types/sizeof b/auto/types/sizeof
+index 9215a54..965561a 100644
+--- a/auto/types/sizeof
++++ b/auto/types/sizeof
+@@ -14,7 +14,7 @@ END
+ 
+ ngx_size=
+ 
+-cat << END > $NGX_AUTOTEST.c
++cat << _EOF > $NGX_AUTOTEST.c
+ 
+ #include <sys/types.h>
+ #include <sys/time.h>
+@@ -25,25 +25,52 @@ $NGX_INCLUDE_UNISTD_H
+ $NGX_INCLUDE_INTTYPES_H
+ $NGX_INCLUDE_AUTO_CONFIG_H
+ 
+-int main() {
+-    printf("%d", (int) sizeof($ngx_type));
++#if !defined( PASTE)
++#define PASTE2( x, y) x##y
++#define PASTE( x, y)  PASTE2( x, y)
++#endif /* PASTE */
++
++#define SAY_IF_SIZEOF( typename, type, size)   \\
++  static char PASTE( PASTE( PASTE( sizeof_, typename), _is_), size) \\
++    [(sizeof(type) == (size)) ? -1 : 1]
++#define SAY_SIZEOF_END( typename) \\
++  static char PASTE( end_search_for_sizeof_, typename)[-1]
++
++#define SAY_SIZEOF( typename, type) \\
++    SAY_IF_SIZEOF( typename, type, 1); \\
++    SAY_IF_SIZEOF( typename, type, 2); \\
++    SAY_IF_SIZEOF( typename, type, 3); \\
++    SAY_IF_SIZEOF( typename, type, 4); \\
++    SAY_IF_SIZEOF( typename, type, 5); \\
++    SAY_IF_SIZEOF( typename, type, 6); \\
++    SAY_IF_SIZEOF( typename, type, 7); \\
++    SAY_IF_SIZEOF( typename, type, 8); \\
++    SAY_IF_SIZEOF( typename, type, 9); \\
++    SAY_IF_SIZEOF( typename, type, 10); \\
++    SAY_IF_SIZEOF( typename, type, 11); \\
++    SAY_IF_SIZEOF( typename, type, 12); \\
++    SAY_IF_SIZEOF( typename, type, 13); \\
++    SAY_IF_SIZEOF( typename, type, 14); \\
++    SAY_IF_SIZEOF( typename, type, 15); \\
++    SAY_IF_SIZEOF( typename, type, 16); \\
++    SAY_SIZEOF_END( typename)
++
++SAY_SIZEOF(TEST_TYPENAME, TEST_TYPE)
++
++int main(void)
++{
+     return 0;
+ }
+ 
+-END
+-
+-
+-ngx_test="$CC $CC_TEST_FLAGS $CC_AUX_FLAGS \
+-          -o $NGX_AUTOTEST $NGX_AUTOTEST.c $NGX_LD_OPT $ngx_feature_libs"
+-
+-eval "$ngx_test >> $NGX_AUTOCONF_ERR 2>&1"
+-
+-
+-if [ -x $NGX_AUTOTEST ]; then
+-    ngx_size=`$NGX_AUTOTEST`
+-    echo " $ngx_size bytes"
+-fi
++_EOF
+ 
++_ngx_typename=`echo "$ngx_type" | sed 's/ /_/g;s/\*/p/'`
++ngx_size=`$CC $CC_TEST_FLAGS $CC_AUX_FLAGS \
++    -DTEST_TYPENAME="$_ngx_typename" -DTEST_TYPE="$ngx_type" \
++    $NGX_AUTOTEST.c \
++    $NGX_LD_OPT $ngx_feature_libs 2>&1 | \
++    sed -nr "/.*sizeof_${_ngx_typename}_is_([0-9]+).*/ s//\1/p" || \
++    true`
+ 
+ rm -rf $NGX_AUTOTEST*
+ 
+-- 
+1.9.2
+

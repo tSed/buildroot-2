@@ -1,0 +1,59 @@
+From 88a60667416ceca873ffa76fbd9cce9701e5f373 Mon Sep 17 00:00:00 2001
+From: Samuel Martin <s.martin49@gmail.com>
+Date: Sun, 4 May 2014 00:40:49 +0200
+Subject: [PATCH 2/3] auto/feature: disable feature autotest when
+ cross-compiling
+
+This patch introduce a new NGX_CROSSBUILD configure variable that records
+whether --crossbuild=... option was passed on the command line.
+
+Then this variable is used to disable the feature runtest because they
+cannot usually be executed when cross-compiling.
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+---
+ configure      | 1 +
+ auto/feature   | 2 +-
+ auto/options   | 1 +
+ 3 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index d7d8189..83ab376 100755
+--- a/configure
++++ b/configure
+@@ -44,6 +44,7 @@ if test -z "$NGX_PLATFORM"; then
+ else
+     echo "building for $NGX_PLATFORM"
+     NGX_SYSTEM=$NGX_PLATFORM
++    NGX_CROSSBUILD=crossbuild
+ fi
+
+ . auto/cc/conf
+diff --git a/auto/feature b/auto/feature
+index 1145f28..8d9a31c 100644
+--- a/auto/feature
++++ b/auto/feature
+@@ -49,7 +49,7 @@ eval "/bin/sh -c \"$ngx_test\" >> $NGX_AUTOCONF_ERR 2>&1"
+
+ if [ -x $NGX_AUTOTEST ]; then
+
+-    case "$ngx_feature_run" in
++    case "$NGX_CROSSBUILD$ngx_feature_run" in
+
+         yes)
+             # /bin/sh is used to intercept "Killed" or "Abort trap" messages
+diff --git a/auto/options b/auto/options
+index 6cea8c7..de77032 100644
+--- a/auto/options
++++ b/auto/options
+@@ -32,6 +32,7 @@ NGX_TEST_BUILD_EPOLL=NO
+ NGX_TEST_BUILD_RTSIG=NO
+ NGX_TEST_BUILD_SOLARIS_SENDFILEV=NO
+
++NGX_CROSSBUILD=
+ NGX_PLATFORM=
+ NGX_WINE=
+
+--
+1.9.2
+

@@ -1,0 +1,69 @@
+From 4dd76f137fdb13560b417b24416efbc470d77680 Mon Sep 17 00:00:00 2001
+From: Samuel Martin <s.martin49@gmail.com>
+Date: Sun, 4 May 2014 21:24:33 +0200
+Subject: [PATCH 3/3] auto/lib/*: prepend include location with sysroot path
+
+This patch introduce a new NGX_SYSROOT variable used when
+cross-compiling with gcc.
+
+When cross-compiling nginx, the gcc-based cross-compiler will
+automatically set the NGX_SYSROOT value to the right value. This
+variable remains empty if not cross-compiling or no gcc compiler is
+detected.
+This NGX_SYSROOT is prepended to the ngx_feature_path content when
+additional location should be added to the include directory list.
+
+This is necessary to prevent gcc from complaining about unsafe include
+location for cross-compilation (-Wpoision-system-directories), currently
+only triggered by libxslt.
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+---
+ auto/cc/gcc           | 4 ++++
+ auto/lib/libxslt/conf | 2 +-
+ auto/options          | 1 +
+ 3 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/auto/cc/gcc b/auto/cc/gcc
+index c27d857..3bd620a 100644
+--- a/auto/cc/gcc
++++ b/auto/cc/gcc
+@@ -15,6 +15,10 @@ echo " + gcc version: $NGX_GCC_VER"
+ 
+ have=NGX_COMPILER value="\"gcc $NGX_GCC_VER\"" . auto/define
+ 
++# set sysroot in case of cross-compilation
++if [ x$NGX_CROSSBUILD = xcrossbuild ]; then
++    NGX_SYSROOT=`$CC -print-sysroot`
++fi
+ 
+ # Solaris 7's /usr/ccs/bin/as does not support "-pipe"
+ 
+diff --git a/auto/lib/libxslt/conf b/auto/lib/libxslt/conf
+index bc19d83..8196826 100644
+--- a/auto/lib/libxslt/conf
++++ b/auto/lib/libxslt/conf
+@@ -12,7 +12,7 @@
+                       #include <libxslt/xsltInternals.h>
+                       #include <libxslt/transform.h>
+                       #include <libxslt/xsltutils.h>"
+-    ngx_feature_path="/usr/include/libxml2"
++    ngx_feature_path="$NGX_SYSROOT/usr/include/libxml2"
+     ngx_feature_libs="-lxml2 -lxslt"
+     ngx_feature_test="xmlParserCtxtPtr    ctxt = NULL;
+                       xsltStylesheetPtr   sheet = NULL;
+diff --git a/auto/options b/auto/options
+index de77032..a4701ad 100644
+--- a/auto/options
++++ b/auto/options
+@@ -33,6 +33,7 @@ NGX_TEST_BUILD_RTSIG=NO
+ NGX_TEST_BUILD_SOLARIS_SENDFILEV=NO
+ 
+ NGX_CROSSBUILD=
++NGX_SYSROOT=
+ NGX_PLATFORM=
+ NGX_WINE=
+ 
+-- 
+1.9.2
+
