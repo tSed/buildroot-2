@@ -14,8 +14,9 @@ choice
 	prompt "driver"
 	default BR2_PACKAGE_CANFESTIVAL_SOCKET
 
-# - AnaGate CAN(duo) driver [1] and PeakSystem CAN support [2] are not
-#   available (not packaged in Buildroot).
+# - AnaGate CAN(duo) driver [1], PeakSystem CAN drive [2] and
+#   CO-PCICAN driver [3] are not available (not packaged in Buildroot),
+#   so their support are disabled.
 # - virtual_kernel driver disabled because it uses very prehistorical
 #   kernel APIs, that have been renamed, or marked as deprecated or
 #   removed for a long while. The question has been raised on the
@@ -23,6 +24,7 @@ choice
 #
 # [1] http://www.anagate.de/en/index.html
 # [2] http://www.peak-system.com/linux/
+# [3] http://www.cosateq.com/
 # [3] http://sourceforge.net/p/canfestival/mailman/message/32519648/
 
 config BR2_PACKAGE_CANFESTIVAL_VIRTUAL
@@ -59,7 +61,6 @@ config BR2_PACKAGE_CANFESTIVAL_COPCICAN_LINUX
 	help
 	  User space driver interface for CO-PCICAN card.
 
-	  http://www.cosateq.com/
 
 config BR2_PACKAGE_CANFESTIVAL_COPCICAN_COMEDI
 	bool "copcican_comedi"
@@ -79,11 +80,10 @@ config BR2_PACKAGE_CANFESTIVAL_DRIVER
 	default "anagate_linux"	  if BR2_PACKAGE_CANFESTIVAL_ANAGATE_LINUX
 	default "peak_linux"	  if BR2_PACKAGE_CANFESTIVAL_PEAK_LINUX
 	default "virtual"	  if BR2_PACKAGE_CANFESTIVAL_VIRTUAL
-	default "virtual_kernel"  if BR2_PACKAGE_CANFESTIVAL_VIRTUAL_KERNEL
 	default "socket"	  if BR2_PACKAGE_CANFESTIVAL_SOCKET
 	default "lincan"	  if BR2_PACKAGE_CANFESTIVAL_LINCAN
 	default "can4linux"	  if BR2_PACKAGE_CANFESTIVAL_CAN4LINUX
-	default "copcican_linux"  if BR2_PACKAGE_CANFESTIVAL_COCPICAN_LINUX
+	default "copcican_linux"  if BR2_PACKAGE_CANFESTIVAL_COPCICAN_LINUX
 	default "copcican_comedi" if BR2_PACKAGE_CANFESTIVAL_COPCICAN_COMEDI
 
 config BR2_PACKAGE_CANFESTIVAL_ADDITIONAL_OPTIONS
