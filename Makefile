@@ -273,8 +273,6 @@ unexport RUBYOPT
 
 include package/pkg-utils.mk
 
-ifeq ($(BR2_HAVE_DOT_CONFIG),y)
-
 ################################################################################
 #
 # Hide troublesome environment variables from sub processes
@@ -356,8 +354,6 @@ export BASE_DIR
 # what you are doing.
 #
 ################################################################################
-
-all: world
 
 # Include legacy before the other things, because package .mk files
 # may rely on it.
@@ -678,11 +674,11 @@ graph-depends: graph-depends-requirements
 	|tee $(BASE_DIR)/graphs/$(@).dot \
 	|dot $(BR2_GRAPH_DOT_OPTS) -T$(BR_GRAPH_OUT) -o $(BASE_DIR)/graphs/$(@).$(BR_GRAPH_OUT)
 
-else # ifeq ($(BR2_HAVE_DOT_CONFIG),y)
-
+ifeq ($(BR2_HAVE_DOT_CONFIG),y)
+all: world
+else
 all: menuconfig
-
-endif # ifeq ($(BR2_HAVE_DOT_CONFIG),y)
+endif
 
 # configuration
 # ---------------------------------------------------------------------------
